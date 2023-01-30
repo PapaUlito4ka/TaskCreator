@@ -3,7 +3,7 @@ const session = require('express-session');
 const RedisStorage = require('connect-redis')(session);
 const redis = require('redis');
 const mongoose = require('mongoose');
-const passport = require('./src/auth/passport');
+const passport = require('passport');
 const _ = require('dotenv').config();
 const path = require('path');
 
@@ -34,10 +34,6 @@ const PORT = process.env.PORT || 3000;
         }))
         .use(passport.initialize())
         .use(passport.session());
-
-    app.get('/', async (req, res, next) => {
-        res.send('Hello world');
-    });
 
     app.use('/auth', authRouter);
 

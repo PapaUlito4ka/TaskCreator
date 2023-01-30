@@ -4,16 +4,19 @@ const LocalStrategy = require('passport-local');
 const { User } = require('../user/models');
 
 
-passport.use(new LocalStrategy((email, password, done) => {
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+}, (email, password, done) => {
     User.findOne({ email: email }, (err, user) => {
         if (err) {
             return done(err);
         }
         if (!user) {
-            return done(null, false);
+            return done({ message: 'User with given credentials was not found' });
         }
         if (!user.verifyPassword(password)) {
-            return done(null, false);
+            return done({ message: 'Invalid password' });
         }
         return done(null, user);
     });
