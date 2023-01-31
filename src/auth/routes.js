@@ -1,10 +1,9 @@
 const express = require('express');
 const passport = require('./passport');
-const LocalStrategy = require('passport-local');
 
-const { User, UserProfile } = require('../user/models');
 const userService = require('../user/services');
 const { handleApiError } = require('../error');
+const { request } = require('express');
 
 const router = express.Router();
 
@@ -20,7 +19,7 @@ router.post('/sign-up', (req, res, next) => {
 });
 
 router.get('/sign-in', (req, res, next) => {
-    res.send(`Sign in page ${req.query.message}`);
+    res.send(`Sign in page`);
 });
 
 router.post('/sign-in', (req, res, next) => {
@@ -33,8 +32,16 @@ router.post('/sign-in', (req, res, next) => {
             handleApiError(message, res, next);
             return;
         }
+        req.session.user = user;
         res.redirect('/');
     })(req, res, next);
+});
+
+router.post('/logout', (req, res, next) => {
+    if (req.session.user) {
+        req.session.destroy();
+    }
+    res.redirect('/auth/sign-in');
 });
 
 

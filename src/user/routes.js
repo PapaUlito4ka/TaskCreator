@@ -1,26 +1,21 @@
 const express = require('express');
+const { handleApiError } = require('../error');
+const { isLoggedIn } = require('../middleware');
+const { getUserProfile } = require('./services');
+
 
 const router = express.Router();
 
+router.use(isLoggedIn);
 
 router.get('/', (req, res, next) => {
-    res.send('User profile page');
-});
-
-router.post('/', (req, res, next) => {
-    res.send('User profile post method');
-});
-
-router.put('/', (req, res, next) => {
-    res.send('User profile put method');
+    getUserProfile(req.session.user)
+        .then(userJson => res.json(userJson))
+        .catch(err => handleApiError(err, res, next));
 });
 
 router.patch('/', (req, res, next) => {
     res.send('User profile patch method');
-});
-
-router.delete('/', (req, res, next) => {
-    res.send('User profile delete method');
 });
 
 

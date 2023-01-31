@@ -22,3 +22,11 @@ module.exports.createUser = async function (body) {
         });
 };
 
+module.exports.getUserProfile = async function (user) {
+    let userProfile = await UserProfile.findOne({ user: user });
+    return {
+        email: user.email,
+        firstname: userProfile.firstname,
+        lastname: userProfile.lastname
+    }
+}
