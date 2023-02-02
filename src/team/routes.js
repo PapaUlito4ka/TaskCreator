@@ -1,31 +1,45 @@
 const express = require('express');
+const { handleApiError } = require('../error');
+const TeamService = require('./services');
 
 
 const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    res.send('Team page');
+    TeamService.getTeams(req.session.user)
+        .then(teams => res.json(teams))
+        .catch(err => handleApiError(err, res, next))
 });
 
-router.get('/leaded', (req, res, next) => {
-    res.send('Entrusted team page');
+router.get('/founded', (req, res, next) => {
+    TeamService.getFoundedTeams(req.session.user)
+        .then(teams => res.json(teams))
+        .catch(err => handleApiError(err, res, next))
 });
 
 router.post('/', (req, res, next) => {
-    res.send('Create team page');
+    TeamService.createTeam(req.session.user, req.body)
+        .then(() => res.redirect('/teams/founded'))
+        .catch(err => handleApiError(err, res, next))
 });
 
 router.patch('/:id', (req, res, next) => {
-    res.send('Patch team page');
+    TeamService.updateTeam(req.session.user, req.params.id, req.body)
+        .then(() => res.redirect('/teams/founded'))
+        .catch(err => handleApiError(err, res, next))
 });
 
 router.get('/:id', (req, res, next) => {
-    res.send('Get team page');
+    TeamService.getTeam(req.session.user, req.params.id)
+        .then(team => res.json())
+        .catch(err => handleApiError(err, res, next))
 });
 
 router.delete('/:id', (req, res, next) => {
-    res.send('Delete team page');
+    TeamService.deleteTeam(req.session.user, req.params.id)
+        .then(() => res.redirect('/teams/founded'))
+        .catch(err => handleApiError(err, res, next))
 });
 
 

@@ -27,27 +27,14 @@ const taskSchema = new Schema({
     }],
     status: {
         type: String,
-        enum: ['created', 'in-progress', 'done']
+        enum: ['created', 'in-progress', 'done'],
+        default: 'created'
     },
     period: {
         from: { type: Date, default: new Date() },
         to: { type: Date, required: true }
     },
-    comments: [{
-        user: {
-            type: ObjectId,
-            ref: 'User'
-        },
-        body: {
-            type: String,
-            required: true
-        },
-        createdAt: {
-            type: Date,
-            default: new Date()
-        }
-    }]
 });
 
 
-module.exports = mongoose.model('Task', taskSchema);
+module.exports.Task = mongoose.model('Task', taskSchema);

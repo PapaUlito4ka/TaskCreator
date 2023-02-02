@@ -22,11 +22,35 @@ module.exports.createUser = async function (body) {
         });
 };
 
-module.exports.getUserProfile = async function (user) {
+module.exports.getUserProfile = async function (userSession) {
+    let user = await UserProfile.findById(userSession._id);
     let userProfile = await UserProfile.findOne({ user: user });
     return {
         email: user.email,
         firstname: userProfile.firstname,
         lastname: userProfile.lastname
+    };
+};
+
+module.exports.updateUserProfile = async function (userSession, body) {
+    let user = await User.findById(userSession._id);
+    let userProfile = await UserProfile.findOne({ user: user });
+    let userFieldsToChange = {
+        email: user.email,
+    };
+    let userProfileFieldsToChange = {
+        firstname: userProfile.firstname,
+        lastname: userProfile.lastname
+    };
+
+    for (key in body) {
+        if (key in userFieldsToChange) {
+            userFieldsToChange[key] = body[key];
+        } else if (key in userProfileFieldsToChange) {
+            userProfileFieldsToChange[key] = body[key];
+        }
     }
-}
+
+    await user.update({ $set: userFieldsToChange });
+    await userProfile.update({ $set: userProfileFieldsToChange });
+};
