@@ -1,0 +1,28 @@
+{% extends "../index.html" %}
+
+{% block title %}
+<title>Sign up</title>
+{% endblock %}
+
+{% block content %}
+<h1>Sign up page</h1>
+<form action="/auth/sign-up" method="post">
+    <div class="mb-3">
+        <label for="emailInput" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="emailInput" name="email" required>
+    </div>
+    <div class="mb-3">
+        <label for="firstNameInput" class="form-label">First name</label>
+        <input type="text" class="form-control" id="firstNameInput" name="firstname" required>
+    </div>
+    <div class="mb-3">
+        <label for="lastNameInput" class="form-label">Last name</label>
+        <input type="text" class="form-control" id="lastNameInput" name="lastname" required>
+    </div>
+    <div class="mb-3">
+        <label for="passwordInput" class="form-label">Password</label>
+        <input type="password" class="form-control" id="passwordInput" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

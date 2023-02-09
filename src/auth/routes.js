@@ -1,28 +1,28 @@
 const express = require('express');
 const passport = require('./passport');
 
-const userService = require('../user/services');
+const UserService = require('../user/services');
+const { isNotLoggedIn, isLoggedIn } = require('../middleware');
 const { handleApiError } = require('../error');
-const { request } = require('express');
 
 const router = express.Router();
 
 
-router.get('/sign-up', (req, res, next) => {
-    res.send('Sign up page');
+router.get('/sign-up', isNotLoggedIn, (req, res, next) => {
+    res.render('auth/sign-up.html');
 });
 
-router.post('/sign-up', (req, res, next) => {
-    userService.createUser(req.body)
-        .then(() => res.status(201).end())
+router.post('/sign-up', isNotLoggedIn, (req, res, next) => {
+    UserService.createUser(req.body)
+        .then(() => res.redirect('/auth/sign-in'))
         .catch(err => handleApiError(err, res, next));
 });
 
-router.get('/sign-in', (req, res, next) => {
-    res.send(`Sign in page`);
+router.get('/sign-in', isNotLoggedIn, (req, res, next) => {
+    res.render('auth/sign-in.html');
 });
 
-router.post('/sign-in', (req, res, next) => {
+router.post('/sign-in', isNotLoggedIn, (req, res, next) => {
     return passport.authenticate('local', (message, user, err, ...args) => {
         if (err) {
             handleApiError(err, res, next);
@@ -37,7 +37,7 @@ router.post('/sign-in', (req, res, next) => {
     })(req, res, next);
 });
 
-router.post('/logout', (req, res, next) => {
+router.get('/logout', isLoggedIn, (req, res, next) => {
     if (req.session.user) {
         req.session.destroy();
     }

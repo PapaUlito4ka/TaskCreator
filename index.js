@@ -5,23 +5,23 @@ const redis = require('redis');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
-const _ = require('dotenv').config();
+const dotenv = require('dotenv').config();
 const path = require('path');
+const nunjucks = require('nunjucks');
+const morgan = require('morgan');
 
 const app = express();
 const redisClient = redis.createClient({ url: process.env.REDIS_URI, legacyMode: true });
 
 const authRouter = require('./src/auth/routes');
-const userRouter = require('./src/user/routes');
+const apiRouter = require('./src/api/routes');
 
 const PORT = process.env.PORT || 3000;
 
 (async () => {
     mongoose.set('strictQuery', true);
-
     await redisClient.connect();
     await mongoose.connect(process.env.MONGO_URI);
-
     app
         .use('/static', express.static(path.join(__dirname, process.env.STATIC_URL)))
         .use(cookieParser())
@@ -30,16 +30,20 @@ const PORT = process.env.PORT || 3000;
         .use(session({
             store: new RedisStorage({
                 client: redisClient,
-                ttl: 30
+                ttl: 3600
             }),
             secret: process.env.SESSION_SECRET,
             saveUninitialized: false,
             resave: true,
         }))
         .use(passport.authenticate('session'))
+        .use(morgan('common'));
+    nunjucks.configure('src/views', { express: app, autoescape: true });
 
-    app.use('/user', userRouter);
+    
     app.use('/auth', authRouter);
+    app.use('/', apiRouter);
+
 
     app.listen(PORT, () => {
         console.log(`App is running on port ${PORT}`);
