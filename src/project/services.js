@@ -16,6 +16,8 @@ module.exports.getLeadedProjects = async function (userSession) {
 
 module.exports.createProject = async function (userSession, body) {
     let user = await User.findById(userSession._id);
+    let periodFrom = new Date(body.from) || null;
+    let periodTo = new Date(body.to);
 
     await Project.create({
         name: body.name,
@@ -24,8 +26,8 @@ module.exports.createProject = async function (userSession, body) {
         creator: user,
         workers: body.workers,
         period: {
-            from: body.from,
-            to: body.to
+            from: periodFrom,
+            to: periodTo
         }
     });
 };

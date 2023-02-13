@@ -16,7 +16,7 @@
         <div class="col-3"></div>
         <div class="col-sm-6">
             {% block content %}
-            <nav class="navbar navbar-expand-lg sticky-top">
+            <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary mb-3">
                 <div class="container-fluid">
                     <a class="navbar-brand">TaskCreator</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -45,6 +45,89 @@
 
                 </div>
             </nav>
+
+            <div class="card p-2 mb-3" style="min-height: 100px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Active tasks</h2>
+                    <a href="#">View all</a>
+                </div>
+                <div class="border-top mb-2"></div>
+                
+                {% if tasks %}
+                    {% for task in tasks %}
+
+                        <div class="d-flex flex-column">
+                            <div class="d-flex flex-row">
+                                <p>{{ task.name }}</p>
+                                <p>{{ task.creator.firstname }}</p>
+                                <p>{{ task.creator.lastname }}</p>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <p>{{ task.project.name }}</p>
+                                <p>{{ task.period.from }}</p>
+                                <p>{{ task.period.to }}</p>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                    <small>No active tasks</small>
+                {% endif %}
+
+            </div>
+
+            <div class="card p-2 mb-3" style="min-height: 100px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Projects</h2>
+                    <a href="#">View all</a>
+                </div>
+                <div class="border-top mb-2"></div>
+                {% if projects %}
+                    {% for project in projects %}
+
+                        <div class="d-flex flex-column">
+                            <div class="d-flex flex-row">
+                                <p>{{ project.name }}</p>
+                                <p>{{ task.creator.firstname }}</p>
+                                <p>{{ task.creator.lastname }}</p>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <p>{{ project.workers }}</p>
+                                <p>{{ project.period.from }}</p>
+                                <p>{{ project.period.to }}</p>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                    <small>No projects</small>
+                {% endif %}
+            </div>
+
+            <div class="card p-2 mb-3" style="min-height: 100px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>Teams</h2>
+                    <a href="#">View all</a>
+                </div>
+                <div class="border-top mb-2"></div>
+                {% if teams %}
+                    {% for team in teams %}
+
+                        <div class="d-flex flex-column">
+                            <div class="d-flex flex-row">
+                                <p>{{ team.name }}</p>
+                                <p>{{ task.founder.firstname }}</p>
+                                <p>{{ task.founder.lastname }}</p>
+                                <p>{{ task.members }}</p>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                    <small>No teams</small>
+                {% endif %}
+            </div>
+
             {% endblock %}
         </div>
         <div class="col-3"></div>

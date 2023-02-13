@@ -11,7 +11,8 @@ const teamSchema = new Schema({
     },
     founder: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     members: [{
         type: ObjectId,

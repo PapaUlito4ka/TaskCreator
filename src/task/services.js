@@ -16,17 +16,19 @@ module.exports.getEntrustedTasks = async function (userSession) {
 
 module.exports.createTask = async function (userSession, body) {
     let user = await User.findById(userSession._id);
+    let periodFrom = new Date(body.from) || null;
+    let periodTo = new Date(body.to);
 
     await Task.create({
         name: body.name,
         description: body.description,
         project: body.project,
         creator: user,
-        performers: body.performers,
+        performers: body.performers || [],
         status: body.status,
         period: {
-            from: body.from,
-            to: body.to
+            from: periodFrom,
+            to: periodTo
         }
     });
 };

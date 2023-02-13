@@ -15,11 +15,13 @@ const projectSchema = new Schema({
     },
     team: {
         type: ObjectId,
-        ref: 'Team'
+        ref: 'Team',
+        required: true
     },
     creator: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     workers: [{
         type: ObjectId,

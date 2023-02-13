@@ -15,16 +15,21 @@ const taskSchema = new Schema({
     },
     project: {
         type: ObjectId,
-        ref: 'Project'
+        ref: 'Project',
+        required: true
     },
     creator: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
-    performers: [{
-        type: ObjectId,
-        ref: 'User'
-    }],
+    performers: {
+        type: [{
+            type: ObjectId,
+            ref: 'User',
+        }],
+        validate: [numberOfPerformers, '{PATH} must be >= 1']
+    },
     status: {
         type: String,
         enum: ['created', 'in-progress', 'done'],
@@ -35,6 +40,10 @@ const taskSchema = new Schema({
         to: { type: Date, required: true }
     },
 });
+
+function numberOfPerformers(performers) {
+    return performers.length > 0;
+}
 
 
 module.exports.Task = mongoose.model('Task', taskSchema);
