@@ -6,4 +6,81 @@
 
 {% block content %}
 
+<div class="row text-center">
+    <div class="col-6 border-end">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-end">Current tasks</div>
+            {% if tasks.length %}
+            {% for task in tasks %}
+            {% if task.status == "created" %}
+                {% set borderColor = "primary" %}
+            {% elif task.status == "in-progress" %}
+                {% set borderColor = "warning" %}
+            {% else %}
+                {% set borderColor = "success" %}
+            {% endif %}
+            <div class="flex-fill card mb-2 border border-{{ borderColor }}" onclick="location.href='/tasks/{{task._id}}';"
+                style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ task.period.from.toLocaleDateString('en-ZA') }} -
+                        {{ task.period.to.toLocaleDateString('en-ZA') }}
+                    </h6>
+                    <p class="card-text">
+                        {% if task.description %}
+                        {{ task.description|shorten(20) }}
+                        {% else %}
+                        No description
+                        {% endif %}
+                    </p>
+                    <p class="card-text text-{{ borderColor }}">{{ task.status }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active current tasks</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-end">Entrusted tasks</div>
+            {% if entrustedTasks.length %}
+            {% for task in entrustedTasks %}
+            {% if task.status == "created" %}
+                {% set borderColor = "primary" %}
+            {% elif task.status == "in-progress" %}
+                {% set borderColor = "warning" %}
+            {% else %}
+                {% set borderColor = "success" %}
+            {% endif %}
+            <div class="flex-fill card mb-2 border border-{{ borderColor }}" onclick="location.href='/tasks/{{task._id}}';"
+                style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ task.period.from.toLocaleDateString('en-ZA') }} -
+                        {{ task.period.to.toLocaleDateString('en-ZA') }}
+                    </h6>
+                    <p class="card-text">
+                        {% if task.description %}
+                        {{ task.description|shorten(20) }}
+                        {% else %}
+                        No description
+                        {% endif %}
+                    </p>
+                    <p class="card-text text-{{ borderColor }}">{{ task.status }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active entrusted tasks</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
 {% endblock %}

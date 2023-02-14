@@ -7,8 +7,8 @@ const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    TaskService.getTasks(req.session.user)
-        .then(tasks => res.json(tasks))
+    TaskService.tasksPage(req.session.user)
+        .then(tasks => res.render('task/tasks.html', tasks))
         .catch(err => handleApiError(err, res, next))
 });
 
@@ -31,8 +31,8 @@ router.patch('/:id', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-    TaskService.getTask(req.session.user, req.params.id)
-        .then(task => res.json(task))
+    TaskService.taskPage(req.session.user, req.params.id)
+        .then(task => res.render('task/task.html', task))
         .catch(err => handleApiError(err, res, next))
 });
 

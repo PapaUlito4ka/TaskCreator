@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const { User } = require('../user/models.js');
 const { Task } = require('./models.js');
 
@@ -5,7 +6,7 @@ const { Task } = require('./models.js');
 module.exports.getTasks = async function (userSession) {
     let user = await User.findById(userSession._id);
 
-    return await Task.find({ performers: user._id });
+    return await Task.find({ performers: user._id, creator: { $ne: user } });
 };
 
 module.exports.getEntrustedTasks = async function (userSession) {
@@ -64,9 +65,9 @@ module.exports.updateTask = async function (userSession, taskId, body) {
 
 module.exports.getTask = async function (userSession, taskId) {
     let user = await User.findById(userSession._id);
-    let task = await Task.findById(taskId);
+    let task = await Task.findById(taskId).populate('creator');
 
-    if (!(user in task.performers) || task.creator !== user) {
+    if (!(user in task.performers) && !task.creator._id.equals(user._id)) {
         throw new Error(`You don't have access to view this task`);
     }
 
@@ -82,4 +83,21 @@ module.exports.deleteTask = async function (userSession, taskId) {
     }
 
     await task.delete();
+};
+
+
+module.exports.tasksPage = async function (userSession) {
+    let tasks = await this.getTasks(userSession);
+    let entrustedTasks = await this.getEntrustedTasks(userSession);
+
+    return {
+        'tasks': tasks,
+        'entrustedTasks': entrustedTasks
+    };
+};
+
+module.exports.taskPage = async function (userSession, taskId) {
+    let task = await this.getTask(userSession, taskId);
+
+    return { 'task': task };
 };
