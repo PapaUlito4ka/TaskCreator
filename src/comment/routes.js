@@ -10,7 +10,7 @@ router.use(isLoggedIn);
 
 router.post('/', (req, res, next) => {
     CommentService.createComment(req.session.user, req.body)
-        .then(comment => res.json(comment))
+        .then(() => res.redirect(`/tasks/${req.body.task}`))
         .catch(err => handleApiError(err, res, next));
 });
 

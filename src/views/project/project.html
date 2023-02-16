@@ -5,5 +5,76 @@
 {% endblock %}
 
 {% block content %}
+<div class="mb-2 d-flex flex-row justify-content-between">
+    <h2 class="mb-0">{{ project.name }}</h2>
+    <a href="#" class="btn btn-primary">Change</a>
+</div>
+
+<div class="mb-4">
+    <div class="row mb-2">
+        <div class="col-2">Description</div>
+        <div class="col-10">
+            {% if project.description %}
+            <p>{{ project.description }}</p>
+            {% else %}
+            <p><i>Project has no description</i></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Team</div>
+        <div class="col-10">{{ project.team }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Creator</div>
+        <div class="col-10">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Workers</div>
+        <div class="col-10 d-flex flex-column">
+            {% for worker in workerProfiles%}
+            <p>{{ worker.lastname }} {{ worker.firstname }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Start date</div>
+        <div class="col-10">{{ project.period.from.toString().split(' ').slice(1, 4).join(' ') }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">End date</div>
+        <div class="col-10">{{ project.period.to.toString().split(' ').slice(1, 4).join(' ') }}</div>
+    </div>
+
+</div>
+
+<div class="row">
+    <h3>Tasks</h3>
+
+    <div class="d-flex flex-column">
+        {% if tasks.length %}
+        {% for task in tasks %}
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-row justify-content-between">
+                    <h5 class="card-title">{{ task.userProfile.lastname }} {{ task.userProfile.firstname }}</h5>
+                    <small>{{ task.createdAt }}</small>
+                    {% if task.modified %}<small></small>{% endif %}
+                </div>
+                <p class="card-text">{{ task.body }}</p>
+                <a href="#" class="btn btn-primary">Change</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p><i>No tasks</i></p>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

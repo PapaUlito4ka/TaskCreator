@@ -5,9 +5,9 @@ const { Task } = require('../task/models');
 
 module.exports.createComment = async function (userSession, body) {
     let user = await User.findById(userSession._id);
-    let task = await Task.findById(body.taskId);
+    let task = await Task.findById(body.task);
 
-    return await Comment.create({
+    await Comment.create({
         user: user,
         task: task,
         body: body.body

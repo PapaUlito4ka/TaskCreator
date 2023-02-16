@@ -6,4 +6,65 @@
 
 {% block content %}
 
+<div class="row text-center">
+    <div class="col-6 border-end">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-start">Projects</div>
+            {% if projects.length %}
+            {% for project in projects %}
+            <div class="flex-fill card mb-2"
+                onclick="location.href='/projects/{{project._id}}';" style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ project.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ project.period.from.toLocaleDateString('en-ZA') }} -
+                        {{ project.period.to.toLocaleDateString('en-ZA') }}
+                    </h6>
+                    <p class="card-text">
+                        {% if project.description %}
+                        {{ project.description|shorten(20) }}
+                        {% else %}
+                        No description
+                        {% endif %}
+                    </p>
+                    <p class="card-text text-{{ borderColor }}">{{ project.workers.length + 1 }} members</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active projects</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-end">Leaded projects</div>
+            {% if leadedProjects.length %}
+            {% for project in leadedProjects %}
+            <div class="flex-fill card mb-2"
+                onclick="location.href='/projects/{{project._id}}';" style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ project.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ project.period.from.toLocaleDateString('en-ZA') }} -
+                        {{ project.period.to.toLocaleDateString('en-ZA') }}
+                    </h6>
+                    <p class="card-text">
+                        {% if project.description %}
+                        {{ project.description|shorten(20) }}
+                        {% else %}
+                        No description
+                        {% endif %}
+                    </p>
+                    <p class="card-text text-{{ borderColor }}">{{ project.workers.length + 1 }} members</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active leaded projects</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
 {% endblock %}

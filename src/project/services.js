@@ -1,3 +1,4 @@
+const { Task } = require('../task/models.js');
 const { User } = require('../user/models.js');
 const { Project } = require('./models.js');
 
@@ -64,7 +65,7 @@ module.exports.getProject = async function (userSession, projectId) {
     let user = await User.findById(userSession._id);
     let project = await Project.findById(projectId);
 
-    if (!(user in project.workers) || project.creator !== user) {
+    if (!(user in project.workers) && !project.creator.equals(user._id)) {
         throw new Error(`You don't have access to view this project`);
     }
 
@@ -80,4 +81,25 @@ module.exports.deleteProject = async function (userSession, projectId) {
     }
 
     await project.delete();
+};
+
+
+module.exports.projectsPage = async function (userSession) {
+    let projects = await this.getProjects(userSession);
+    let leadedProjects = await this.getLeadedProjects(userSession);
+
+    return {
+        'projects': projects,
+        'leadedProjects': leadedProjects
+    };
+};
+
+module.exports.projectPage = async function (userSession, projectId) {
+    let project = await this.getProject(userSession, projectId);
+    let tasks = await Task.find({ project: project });
+
+    return {
+        'project': project,
+        'tasks': tasks
+    };
 };

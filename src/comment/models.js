@@ -7,11 +7,13 @@ const ObjectId = mongoose.Types.ObjectId;
 const commentSchema = new Schema({
     user: {
         type: ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     task: {
         type: ObjectId,
-        ref: 'Task'
+        ref: 'Task',
+        required: true
     },
     body: {
         type: String,
@@ -20,6 +22,10 @@ const commentSchema = new Schema({
     modified: {
         type: Boolean,
         default: false
+    },
+    createdAt: {
+        type: Date,
+        default: new Date()
     }
 });
 

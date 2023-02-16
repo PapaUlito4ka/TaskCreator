@@ -5,19 +5,94 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <p>{{ task.name }}</p>
-    <p>{{ task.description }}</p>
-    <p>{{ task.creator }}</p>
-    <p>{{ task.project }}</p>
-    <p>{{ task.performers }}</p>
-    <p>{{ task.project }}</p>
-    <p>{{ task.status }}</p>
-    <p>{{ task.period.from.toLocaleDateString('en-ZA') }} -
-        {{ task.period.to.toLocaleDateString('en-ZA') }}</p>
+<div class="mb-2 d-flex flex-row justify-content-between">
+    <h2 class="mb-0">{{ task.name }}</h2>
+    <a href="#" class="btn btn-primary">Change</a>
+</div>
+
+<div class="mb-4">
+    <div class="row mb-2">
+        {% if task.status == "created" %}
+        {% set borderColor = "primary" %}
+        {% elif task.status == "in-progress" %}
+        {% set borderColor = "warning" %}
+        {% else %}
+        {% set borderColor = "success" %}
+        {% endif %}
+        <div class="col-2">Status</div>
+        <div class="col-10 text-{{borderColor}}">{{ task.status[0].toUpperCase() + task.status.slice(1) }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Description</div>
+        <div class="col-10">
+            {% if task.description %}
+            <p>{{ task.description }}</p>
+            {% else %}
+            <p><i>Task has no description</i></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Creator</div>
+        <div class="col-10">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Project</div>
+        <div class="col-10">{{ task.project.name }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Performers</div>
+        <div class="col-10 d-flex flex-column">
+            {% for performer in performerProfiles%}
+            <p>{{ performer.lastname }} {{ performer.firstname }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">Start date</div>
+        <div class="col-10">{{ task.period.from.toString().split(' ').slice(1, 4).join(' ') }}</div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-2">End date</div>
+        <div class="col-10">{{ task.period.to.toString().split(' ').slice(1, 4).join(' ') }}</div>
+    </div>
+
 </div>
 
 <div class="row">
-    <h2>Comments</h2>
+    <h3>Comments</h3>
+
+    <form class="d-flex flex-row mb-2">
+        <div class="flex-grow-1">
+            <input type="text" class="form-control" placeholder="Send comment . . .">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <div class="d-flex flex-column">
+        {% if comments.length %}
+        {% for comment in comments %}
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-row justify-content-between">
+                    <h5 class="card-title">{{ comment.userProfile.lastname }} {{ comment.userProfile.firstname }}</h5>
+                    <small>{{ comment.createdAt }}</small>
+                    {% if comment.modified %}<small></small>{% endif %}
+                </div>
+                <p class="card-text">{{ comment.body }}</p>
+                <a href="#" class="btn btn-primary">Change</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p><i>No comments</i></p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

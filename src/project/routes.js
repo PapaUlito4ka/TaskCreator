@@ -7,8 +7,8 @@ const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    ProjectService.getProjects(req.session.user)
-        .then(projects => res.json(projects))
+    ProjectService.projectsPage(req.session.user)
+        .then(projects => res.render('project/projects.html', projects))
         .catch(err => handleApiError(err, res, next))
 });
 
@@ -31,8 +31,8 @@ router.patch('/:id', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-    ProjectService.getProject(req.session.user, req.params.id)
-        .then(() => res.redirect('/projects/leaded'))
+    ProjectService.projectPage(req.session.user, req.params.id)
+        .then(project => res.render('project/project.html', project))
         .catch(err => handleApiError(err, res, next))
 });
 

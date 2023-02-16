@@ -1,6 +1,6 @@
-const { default: mongoose } = require('mongoose');
-const { User } = require('../user/models.js');
+const { User, UserProfile } = require('../user/models.js');
 const { Task } = require('./models.js');
+const { Comment } = require('../comment/models');
 
 
 module.exports.getTasks = async function (userSession) {
@@ -65,11 +65,11 @@ module.exports.updateTask = async function (userSession, taskId, body) {
 
 module.exports.getTask = async function (userSession, taskId) {
     let user = await User.findById(userSession._id);
-    let task = await Task.findById(taskId).populate('creator');
+    let task = await Task.findById(taskId);
 
-    if (!(user in task.performers) && !task.creator._id.equals(user._id)) {
-        throw new Error(`You don't have access to view this task`);
-    }
+    // if (!(user in task.performers) && !task.creator.equals(user._id)) {
+    //     throw new Error(`You don't have access to view this task`);
+    // }
 
     return task;
 };
@@ -97,7 +97,18 @@ module.exports.tasksPage = async function (userSession) {
 };
 
 module.exports.taskPage = async function (userSession, taskId) {
-    let task = await this.getTask(userSession, taskId);
+    let task = await (await this.getTask(userSession, taskId)).populate('project');
+    let creatorProfile = await UserProfile.findOne({ user: task.creator });
+    let performerProfiles = await UserProfile.find({ user: task.performers });
+    let comments = await Comment.find({ task: task });
+    for (let comment of comments) {
+        comment.userProfile = await UserProfile.findOne({ user: comment.user });
+    }
 
-    return { 'task': task };
+    return {
+        'task': task,
+        'creatorProfile': creatorProfile,
+        'performerProfiles': performerProfiles,
+        'comments': comments
+    };
 };
