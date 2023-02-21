@@ -1,4 +1,4 @@
-const { User } = require('../user/models.js');
+const { User, UserProfile } = require('../user/models.js');
 const { Team } = require('./models.js');
 
 
@@ -50,7 +50,7 @@ module.exports.getTeam = async function (userSession, teamId) {
     let user = await User.findById(userSession._id);
     let team = await Team.findById(teamId);
 
-    if (!(user in team.members) || team.founder !== user) {
+    if (!(user in team.members) && !team.founder.equals(user._id)) {
         throw new Error(`You don't have access to view this team`);
     }
 
@@ -66,4 +66,31 @@ module.exports.deleteTeam = async function (userSession, teamId) {
     }
 
     await team.delete();
+};
+
+module.exports.teamsPage = async function (userSession) {
+    let teams = await this.getTeams(userSession);
+    let foundedTeams = await this.getFoundedTeams(userSession);
+    for (let team of teams) {
+        team.founderProfile = await UserProfile.findOne({ user: team.founder });
+    }
+
+    return {
+        'teams': teams,
+        'foundedTeams': foundedTeams
+    };
+};
+
+module.exports.teamPage = async function (userSession, teamId) {
+    let team = await this.getTeam(userSession, teamId).then(team => team.populate('members'));
+    let founderProfile = await UserProfile.findOne({ user: team.founder });
+
+    for (let member of team.members) {
+        member.userProfile = await UserProfile.findOne({ user: member._id });
+    }
+
+    return {
+        'team': team,
+        'founderProfile': founderProfile
+    };
 };

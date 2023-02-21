@@ -5,5 +5,45 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="row text-center">
+    <div class="col-6 border-end">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-start">Teams</div>
+            {% if teams.length %}
+            {% for team in teams %}
+            <div class="flex-fill card mb-2" onclick="location.href='/teams/{{team._id}}';"
+                style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ team.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ team.founderProfile.lastname }} {{ team.founderProfile.firstname }}
+                    </h6>
+                    <p class="card-text">{{ team.members.length + 1 }} members</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active teams</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="d-flex flex-column">
+            <div class="flex-fill p-2 mb-2 border-end">Founded teams</div>
+            {% if foundedTeams.length %}
+            {% for team in foundedTeams %}
+            <div class="flex-fill card mb-2" onclick="location.href='/teams/{{team._id}}';"
+                style="cursor: pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ team.name }}</h5>
+                    <p class="card-text">{{ team.members.length + 1 }} members</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="flex-fill card p-2 mb-2">No active teams</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

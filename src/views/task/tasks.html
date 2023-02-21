@@ -9,7 +9,7 @@
 <div class="row text-center">
     <div class="col-6 border-end">
         <div class="d-flex flex-column">
-            <div class="flex-fill p-2 mb-2 border-end">Current tasks</div>
+            <div class="flex-fill p-2 mb-2 border-start">Current tasks</div>
             {% if tasks.length %}
             {% for task in tasks %}
             {% if task.status == "created" %}
@@ -65,7 +65,7 @@
                     </h6>
                     <p class="card-text">
                         {% if task.description %}
-                        {{ task.description|shorten(20) }}
+                        {{ task.description }}
                         {% else %}
                         No description
                         {% endif %}

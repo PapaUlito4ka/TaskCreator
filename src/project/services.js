@@ -1,6 +1,8 @@
 const { Task } = require('../task/models.js');
-const { User } = require('../user/models.js');
+const { User, UserProfile } = require('../user/models.js');
 const { Project } = require('./models.js');
+
+const UserService = require('../user/services');
 
 
 module.exports.getProjects = async function (userSession) {
@@ -95,11 +97,26 @@ module.exports.projectsPage = async function (userSession) {
 };
 
 module.exports.projectPage = async function (userSession, projectId) {
-    let project = await this.getProject(userSession, projectId);
+    let project = await this.getProject(userSession, projectId)
+        .then(project => project.populate('team'));
     let tasks = await Task.find({ project: project });
+    for (let task of tasks) {
+        task.userPro
+    }
+    let expiredTasks = tasks.filter(task => new Date() > task.period.to);
+    let createdTasks = tasks.filter(task => task.status === 'created');
+    let inProgressTasks = tasks.filter(task => task.status === 'in-progress');
+    let finishedTasks = tasks.filter(task => task.status === 'finished');
+    let creatorProfile = await UserProfile.findOne({ user: project.creator });
+    let workerProfiles = await UserProfile.find({ user: project.workers });
 
     return {
         'project': project,
-        'tasks': tasks
+        'expiredTasks': expiredTasks,
+        'createdTasks': createdTasks,
+        'inProgressTasks': inProgressTasks,
+        'finishedTasks': finishedTasks,
+        'creatorProfile': creatorProfile,
+        'workerProfiles': workerProfiles
     };
 };

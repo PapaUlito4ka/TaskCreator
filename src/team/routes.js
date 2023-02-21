@@ -7,8 +7,8 @@ const router = express.Router();
 
 
 router.get('/', (req, res, next) => {
-    TeamService.getTeams(req.session.user)
-        .then(teams => res.json(teams))
+    TeamService.teamsPage(req.session.user)
+        .then(teams => res.render('team/teams.html', teams))
         .catch(err => handleApiError(err, res, next))
 });
 
@@ -31,8 +31,8 @@ router.patch('/:id', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-    TeamService.getTeam(req.session.user, req.params.id)
-        .then(team => res.json())
+    TeamService.teamPage(req.session.user, req.params.id)
+        .then(team => res.render('team/team.html', team))
         .catch(err => handleApiError(err, res, next))
 });
 

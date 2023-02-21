@@ -24,7 +24,7 @@
 
     <div class="row mb-2">
         <div class="col-2">Team</div>
-        <div class="col-10">{{ project.team }}</div>
+        <div class="col-10">{{ project.team.name }}</div>
     </div>
 
     <div class="row mb-2">
@@ -35,9 +35,13 @@
     <div class="row mb-2">
         <div class="col-2">Workers</div>
         <div class="col-10 d-flex flex-column">
-            {% for worker in workerProfiles%}
+            {% if workerProfiles.length %}
+            {% for worker in workerProfiles %}
             <p>{{ worker.lastname }} {{ worker.firstname }}</p>
             {% endfor %}
+            {% else %}
+            <p><i>Project has no workers</i></p>
+            {% endif %}
         </div>
     </div>
 
@@ -56,24 +60,80 @@
 <div class="row">
     <h3>Tasks</h3>
 
-    <div class="d-flex flex-column">
-        {% if tasks.length %}
-        {% for task in tasks %}
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex flex-row justify-content-between">
-                    <h5 class="card-title">{{ task.userProfile.lastname }} {{ task.userProfile.firstname }}</h5>
-                    <small>{{ task.createdAt }}</small>
-                    {% if task.modified %}<small></small>{% endif %}
+    <div class="container text-center">
+        <div class="row gx-2">
+            <div class="col">
+                <h4><i class="text-danger">Expired</i></h4>
+                {% if expiredTasks.length %}
+                {% for task in expiredTasks %}
+                <div class="card border border-danger mb-2" onclick="location.href='/tasks/{{task._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.name }}</h5>
+                        <p class="card-text mb-2">Expire: {{ task.period.to.toLocaleDateString('en-ZA') }}</p>
+                        <p class="card-text">{{ task.performers.length }} performers</p>
+                    </div>
                 </div>
-                <p class="card-text">{{ task.body }}</p>
-                <a href="#" class="btn btn-primary">Change</a>
+                {% endfor %}
+                {% else %}
+                <p><i>No tasks</i></p>
+                {% endif %}
+            </div>
+
+            <div class="col">
+                <h4><i class="text-primary">Created</i></h4>
+                {% if createdTasks.length %}
+                {% for task in createdTasks %}
+                <div class="card border border-primary mb-2" onclick="location.href='/tasks/{{task._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.name }}</h5>
+                        <p class="card-text mb-2">Expire: {{ task.period.to.toLocaleDateString('en-ZA') }}</p>
+                        <p class="card-text">{{ task.performers.length }} performers</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p><i>No tasks</i></p>
+                {% endif %}
+            </div>
+
+            <div class="col">
+                <h4><i class="text-warning">In-progress</i></h4>
+                {% if inProgressTasks.length %}
+                {% for task in inProgressTasks %}
+                <div class="card border border-warning mb-2" onclick="location.href='/tasks/{{task._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.name }}</h5>
+                        <p class="card-text mb-2">Expire: {{ task.period.to.toLocaleDateString('en-ZA') }}</p>
+                        <p class="card-text">{{ task.performers.length }} performers</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p><i>No tasks</i></p>
+                {% endif %}
+            </div>
+
+            <div class="col">
+                <h4><i class="text-success">Done</i></h4>
+                {% if finishedTasks.length %}
+                {% for task in finishedTasks %}
+                <div class="card border border-success mb-2" onclick="location.href='/tasks/{{task._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.name }}</h5>
+                        <p class="card-text mb-2">Expire: {{ task.period.to.toLocaleDateString('en-ZA') }}</p>
+                        <p class="card-text">{{ task.performers.length }} performers</p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p><i>No tasks</i></p>
+                {% endif %}
             </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <p><i>No tasks</i></p>
-        {% endif %}
     </div>
 </div>
 
