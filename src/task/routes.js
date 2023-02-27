@@ -18,6 +18,12 @@ router.get('/entrusted', (req, res, next) => {
         .catch(err => handleApiError(err, res, next))
 });
 
+router.get('/create', (req, res, next) => {
+    res.render('task/create_task.html', {
+        'userSession': req.session.user
+    });
+});
+
 router.post('/', (req, res, next) => {
     TaskService.createTask(req.session.user, req.body)
         .then(() => res.redirect('/tasks/entrusted'))

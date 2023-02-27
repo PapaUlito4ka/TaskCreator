@@ -18,6 +18,12 @@ router.get('/leaded', (req, res, next) => {
         .catch(err => handleApiError(err, res, next))
 });
 
+router.get('/create', (req, res, next) => {
+    res.render('project/create_project.html', {
+        'userSession': req.session.user
+    });
+});
+
 router.post('/', (req, res, next) => {
     ProjectService.createProject(req.session.user, req.body)
         .then(() => res.redirect('/projects/leaded'))

@@ -14,6 +14,7 @@ const app = express();
 const redisClient = redis.createClient({ url: process.env.REDIS_URI, legacyMode: true });
 
 const authRouter = require('./src/auth/routes');
+const pagesRouter = require('./src/pages/routes');
 const apiRouter = require('./src/api/routes');
 
 const PORT = process.env.PORT || 3000;
@@ -40,10 +41,9 @@ const PORT = process.env.PORT || 3000;
         .use(morgan('common'));
     nunjucks.configure('src/views', { express: app, autoescape: true });
 
-    
+    app.use('/api/v1', apiRouter);
     app.use('/auth', authRouter);
-    app.use('/', apiRouter);
-
+    app.use('/', pagesRouter);
 
     app.listen(PORT, () => {
         console.log(`App is running on port ${PORT}`);

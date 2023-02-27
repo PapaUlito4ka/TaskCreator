@@ -50,6 +50,11 @@ userSchema.path('password').set(function (rawPassword) {
 });
 
 
+userProfileSchema.methods.getFullName = function () {
+    return this.lastname + ' ' + this.firstname;
+};
+
+
 const User = mongoose.model('User', userSchema);
 const UserProfile = mongoose.model('UserProfile', userProfileSchema);
 

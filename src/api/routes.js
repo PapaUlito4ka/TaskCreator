@@ -1,25 +1,20 @@
 const express = require('express');
+const { handleApiError } = require('../error');
 const router = express.Router();
 
 const middleware = require('../middleware');
-const userRouter = require('../user/routes');
-const teamRouter = require('../team/routes');
-const taskRouter = require('../task/routes');
-const projectRouter = require('../project/routes');
-const commentRouter = require('../comment/routes');
-const { getHomePage } = require('./services');
+const ApiService = require('./services');
 
-router.use(middleware.isLoggedIn);
+// router.use(middleware.isLoggedIn);
 
-router.use('/user', userRouter);
-router.use('/teams', teamRouter);
-router.use('/tasks', taskRouter);
-router.use('/projects', projectRouter);
-router.use('/comments', commentRouter);
-
-router.get('/', async (req, res, next) => {
-    res.render('index.html', await getHomePage(req.session.user));
+router.get('/users', (req, res, next) => {
+    ApiService.getAllUsers(req.query.exceptUserId)
+        .then(users => res.json(users))
+        .catch(err => handleApiError(err, res, next));
 });
+
+
+
 
 
 module.exports = router;

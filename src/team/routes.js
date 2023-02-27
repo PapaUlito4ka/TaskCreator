@@ -24,6 +24,12 @@ router.post('/', (req, res, next) => {
         .catch(err => handleApiError(err, res, next))
 });
 
+router.get('/create', (req, res, next) => {
+    res.render('team/create_team.html', {
+        'userSession': req.session.user
+    });
+});
+
 router.patch('/:id', (req, res, next) => {
     TeamService.updateTeam(req.session.user, req.params.id, req.body)
         .then(() => res.redirect('/teams/founded'))

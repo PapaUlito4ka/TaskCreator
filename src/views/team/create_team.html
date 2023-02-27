@@ -1,0 +1,82 @@
+{% extends "../index.html" %}
+
+{% block title %}
+<title>Create team</title>
+{% endblock %}
+
+{% block content %}
+<h2>Create your own team</h2>
+<form method="post" action="/teams/" id="teamFormId">
+    <div class="mb-3">
+        <label for="nameInputId" class="form-label">Name</label>
+        <input type="text" class="form-control" id="nameInputId" name="name" required>
+    </div>
+    <div class="mb-3">
+        <label for="membersInputId" class="form-label">Members</label>
+        <input type="text" class="form-control" id="membersInputId" name="members">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    function getAllUsers(url) {
+        $.ajax({
+            url: url,
+            method: 'get',
+            success: function (json) {
+                let users = json;
+
+                $('#membersInputId')
+                    .on('keydown', function (event) {
+                        if (event.keyCode === $.ui.keyCode.TAB &&
+                            $(this).autocomplete('instance').menu.active) {
+                            event.preventDefault();
+                        }
+                    })
+                    .on('focusout', function (event) {
+                        if (this.onFocusoutClear) {
+                            this.value = '';
+                            this.onFocusoutClear = false;
+                        }
+                    })
+                    .autocomplete({
+                        minLength: 0,
+                        source: function (request, response) {
+                            response($.ui.autocomplete.filter(users, extractLast(request.term)));
+                        },
+                        focus: function () {
+                            return false;
+                        },
+                        select: function (event, ui) {
+                            var terms = split(this.value);
+                            terms.pop();
+                            terms.push(ui.item.value);
+                            terms.push('');
+                            this.value = terms.join(' ');
+                            return false;
+                        },
+                        response: function (event, ui) {
+                            if (!ui.content.length) this.onFocusoutClear = true;
+                        }
+                    });
+            }
+        });
+    }
+
+    function split(val) {
+        return val.split(/ \s*/);
+    }
+
+    function extractLast(term) {
+        return split(term).pop();
+    }
+
+    (() => {
+        getAllUsers('/api/v1/users?exceptUserId={{ userSession._id }}');
+    })();
+
+</script>
+{% endblock %}
