@@ -17,11 +17,13 @@
     </div>
     <div class="mb-3">
         <label for="teamInputId" class="form-label">Team</label>
-        <input type="text" class="form-control" id="teamInputId" name="team" required>
+        <input type="text" class="form-control" id="teamBlobInputId" name="team_blob" required>
+        <input type="text" class="form-control" id="teamInputId" name="team" hidden>
     </div>
     <div class="mb-3">
         <label for="workersInputId" class="form-label">Workers</label>
-        <input type="text" class="form-control" id="workersInputId" name="workers" required>
+        <input type="text" class="form-control" id="workersBlobInputId" name="workers_blob" required>
+        <input type="text" class="form-control" id="workersInputId" name="workers" hidden>
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
@@ -35,14 +37,24 @@
 {% block scripts %}
 <script>
 
-    function getAllUsers(url) {
+    function split(val, regExpr=/ \s*/) {
+        return val.split(regExpr);
+    }
+
+    function extractLast(term) {
+        return split(term).pop();
+    }
+
+    function getUserTeams(url) {
         $.ajax({
             url: url,
             method: 'get',
             success: function (json) {
-                let users = json;
+                let teams = json;
+                teams = teams.map(team => { return { 'label': team.name, 'value': team._id } });
+                let teamInput = $('#teamInputId');
 
-                $('#membersInputId')
+                $('#teamBlobInputId')
                     .on('keydown', function (event) {
                         if (event.keyCode === $.ui.keyCode.TAB &&
                             $(this).autocomplete('instance').menu.active) {
@@ -52,23 +64,26 @@
                     .on('focusout', function (event) {
                         if (this.onFocusoutClear) {
                             this.value = '';
+                            teamInput.val('');
+                            $('#workersBlobInputId').unbind();
                             this.onFocusoutClear = false;
                         }
+                    })
+                    .on('focusin', function (event) {
+                        $(this).autocomplete('search', '');
                     })
                     .autocomplete({
                         minLength: 0,
                         source: function (request, response) {
-                            response($.ui.autocomplete.filter(users, extractLast(request.term)));
+                            response($.ui.autocomplete.filter(teams, extractLast(request.term)));
                         },
                         focus: function () {
                             return false;
                         },
                         select: function (event, ui) {
-                            var terms = split(this.value);
-                            terms.pop();
-                            terms.push(ui.item.value);
-                            terms.push('');
-                            this.value = terms.join(' ');
+                            this.value = ui.item.label;
+                            teamInput.val(ui.item.value);
+                            getTeamMembers(`/api/v1/teams/${ui.item.value}/members`);
                             return false;
                         },
                         response: function (event, ui) {
@@ -79,16 +94,69 @@
         });
     }
 
-    function split(val) {
-        return val.split(/ \s*/);
+    function getTeamMembers(url) {
+        $.ajax({
+            url: url,
+            method: 'get',
+            success: function (json) {
+                let members = json;
+                members = members.map(member => { 
+                    return { 'label': member.fullname, 'value': member._id } 
+                });
+                let workersInput = $('#workersInputId');
+
+                $('#workersBlobInputId')
+                    .on('keydown', function (event) {
+                        if (event.keyCode === $.ui.keyCode.TAB &&
+                            $(this).autocomplete('instance').menu.active) {
+                            event.preventDefault();
+                        }
+                    })
+                    .on('focusout', function (event) {
+                        if (this.onFocusoutClear) {
+                            this.value = '';
+                            workersInput.val('');
+                            this.onFocusoutClear = false;
+                        }
+                    })
+                    .on('focusin', function (event) {
+                        $(this).autocomplete('search', '');
+                    })
+                    .autocomplete({
+                        minLength: 0,
+                        source: function (request, response) {
+                            response($.ui.autocomplete.filter(members, extractLast(request.term)));
+                        },
+                        focus: function () {
+                            return false;
+                        },
+                        select: function (event, ui) {
+                            var terms = split(this.value, /, \s*/);
+                            terms.pop();
+                            terms.push(ui.item.label);
+                            terms.push('');
+                            this.value = terms.join(', ');
+
+                            terms = split(workersInput.val());
+                            terms.pop();
+                            terms.push(ui.item.value);
+                            terms.push('');
+                            workersInput.val(terms.join(' '));
+                            return false;
+                        },
+                        response: function (event, ui) {
+                            if (!ui.content.length) this.onFocusoutClear = true;
+                        }
+                    });
+            }
+        });
     }
 
-    function extractLast(term) {
-        return split(term).pop();
-    }
 
     (() => {
-        getAllUsers('/api/v1/users?exceptUserId={{ userSession._id }}');
+        getUserTeams('/api/v1/users/{{ userSession._id }}/teams');
+
+        $('#periodFromInputId').prop('min', new Date().toLocaleDateString('fr-ca'));
     })();
 
 </script>

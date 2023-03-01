@@ -2,10 +2,8 @@ const express = require('express');
 const { handleApiError } = require('../error');
 const router = express.Router();
 
-const middleware = require('../middleware');
 const ApiService = require('./services');
 
-// router.use(middleware.isLoggedIn);
 
 router.get('/users', (req, res, next) => {
     ApiService.getAllUsers(req.query.exceptUserId)
@@ -13,8 +11,17 @@ router.get('/users', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
+router.get('/users/:userId/teams', (req, res, next) => {
+    ApiService.getUserTeams(req.params.userId)
+        .then(teams => res.json(teams))
+        .catch(err => handleApiError(err, res, next));
+});
 
-
+router.get('/teams/:teamId/members', (req, res, next) => {
+    ApiService.getTeamMembers(req.params.teamId)
+        .then(members => res.json(members))
+        .catch(err => handleApiError(err, res, next));
+});
 
 
 module.exports = router;
