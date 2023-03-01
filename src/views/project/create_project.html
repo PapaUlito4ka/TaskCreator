@@ -6,7 +6,7 @@
 
 {% block content %}
 <h2>Create your own project</h2>
-<form method="post" action="/tasks/" id="taskFormId">
+<form method="post" action="/projects/" id="projectFormId">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
         <input type="text" class="form-control" id="nameInputId" name="name" required>
@@ -37,7 +37,7 @@
 {% block scripts %}
 <script>
 
-    function split(val, regExpr=/ \s*/) {
+    function split(val, regExpr = / \s*/) {
         return val.split(regExpr);
     }
 
@@ -100,8 +100,8 @@
             method: 'get',
             success: function (json) {
                 let members = json;
-                members = members.map(member => { 
-                    return { 'label': member.fullname, 'value': member._id } 
+                members = members.map(member => {
+                    return { 'label': member.fullname, 'value': member._id }
                 });
                 let workersInput = $('#workersInputId');
 
@@ -117,6 +117,10 @@
                             this.value = '';
                             workersInput.val('');
                             this.onFocusoutClear = false;
+                        } else if (this.value.endsWith(', ')) {
+                            let terms = split(this.value, /, \s*/);
+                            terms.pop();
+                            this.value = terms.join(', ');
                         }
                     })
                     .on('focusin', function (event) {

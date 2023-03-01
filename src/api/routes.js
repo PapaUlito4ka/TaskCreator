@@ -23,5 +23,17 @@ router.get('/teams/:teamId/members', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
+router.get('/users/:userId/projects', (req, res, next) => {
+    ApiService.getUserProjects(req.params.userId)
+        .then(projects => res.json(projects))
+        .catch(err => handleApiError(err, res, next));
+});
+
+router.get('/projects/:projectId/workers', (req, res, next) => {
+    ApiService.getProjectWorkers(req.params.projectId)
+        .then(workers => res.json(workers))
+        .catch(err => handleApiError(err, res, next));
+});
+
 
 module.exports = router;

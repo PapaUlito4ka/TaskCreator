@@ -1,42 +1,38 @@
 {% extends "../index.html" %}
 
 {% block title %}
-<title>Create task</title>
+<title>Create project</title>
 {% endblock %}
 
 {% block content %}
-<h2>Create your own task</h2>
-<form method="post" action="/tasks/" id="taskFormId">
+<h2>Create your own project</h2>
+<form id="projectFormId">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
-        <input type="text" class="form-control" id="nameInputId" name="name" required>
+        <input type="text" class="form-control" id="nameInputId" name="name" value="{{ project.name }}" required>
     </div>
     <div class="mb-3">
         <label for="descriptionInputId" class="form-label">Description</label>
-        <input type="text" class="form-control" id="descriptionInputId" name="description">
+        <input type="text" class="form-control" id="descriptionInputId" name="description"
+            value="{{ project.description }}" required>
     </div>
     <div class="mb-3">
-        <label for="projectInputId" class="form-label">Project</label>
-        <input type="text" class="form-control" id="projectBlobInputId" name="project_blob" required>
-        <input type="text" class="form-control" id="projectInputId" name="project" hidden>
+        <label for="teamInputId" class="form-label">Team</label>
+        <input type="text" class="form-control" id="teamBlobInputId" name="team_blob" value="{{ project.teamBlob }}"
+            required>
+        <input type="text" class="form-control" id="teamInputId" name="team" value="{{ project.team }}" hidden>
     </div>
     <div class="mb-3">
-        <label for="performersInputId" class="form-label">Performers</label>
-        <input type="text" class="form-control" id="performersBlobInputId" name="performers_blob" required>
-        <input type="text" class="form-control" id="performersInputId" name="performers" hidden>
-    </div>
-    <div class="mb-3">
-        <label for="statusInputId" class="form-label">Status</label>
-        <select class="form-select" id="statusInputId">
-            <option selected value="created">Created</option>
-            <option value="in-progress">In-progress</option>
-            <option value="done">Done</option>
-        </select>
+        <label for="workersInputId" class="form-label">Workers</label>
+        <input type="text" class="form-control" id="workersBlobInputId" name="workers_blob"
+            value="{{ project.workersBlob }}" required>
+        <input type="text" class="form-control" id="workersInputId" name="workers" value="{{ project.workers }}" hidden>
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
-        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]">
-        <input type="date" class="form-control" id="periodToInputId" name="period[to]">
+        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]"
+            value="{{ project.period.from }}">
+        <input type="date" class="form-control" id="periodToInputId" name="period[to]" value="{{ project.period.to }}">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -44,6 +40,16 @@
 
 {% block scripts %}
 <script>
+    function sendForm() {
+        $.ajax({
+            type: 'put',
+            url: '/projects/{{ project._id }}',
+            data: $('#projectFormId').serialize(),
+            success: function (data, textStatus, jqXHR) {
+                alert('everything was OK');
+            }
+        });
+    }
 
     function split(val, regExpr = / \s*/) {
         return val.split(regExpr);
@@ -53,16 +59,16 @@
         return split(term).pop();
     }
 
-    function getUserProjects(url) {
+    function getUserTeams(url) {
         $.ajax({
             url: url,
             method: 'get',
             success: function (json) {
-                let projects = json;
-                projects = projects.map(project => { return { 'label': project.name, 'value': project._id } });
-                let projectInput = $('#projectInputId');
+                let teams = json;
+                teams = teams.map(team => { return { 'label': team.name, 'value': team._id } });
+                let teamInput = $('#teamInputId');
 
-                $('#projectBlobInputId')
+                $('#teamBlobInputId')
                     .on('keydown', function (event) {
                         if (event.keyCode === $.ui.keyCode.TAB &&
                             $(this).autocomplete('instance').menu.active) {
@@ -72,8 +78,8 @@
                     .on('focusout', function (event) {
                         if (this.onFocusoutClear) {
                             this.value = '';
-                            projectInput.val('');
-                            $('#performersBlobInputId').unbind();
+                            teamInput.val('');
+                            $('#workersBlobInputId').unbind();
                             this.onFocusoutClear = false;
                         }
                     })
@@ -83,15 +89,15 @@
                     .autocomplete({
                         minLength: 0,
                         source: function (request, response) {
-                            response($.ui.autocomplete.filter(projects, extractLast(request.term)));
+                            response($.ui.autocomplete.filter(teams, extractLast(request.term)));
                         },
                         focus: function () {
                             return false;
                         },
                         select: function (event, ui) {
                             this.value = ui.item.label;
-                            projectInput.val(ui.item.value);
-                            getProjectWorker(`/api/v1/projects/${ui.item.value}/workers`);
+                            teamInput.val(ui.item.value);
+                            getTeamMembers(`/api/v1/teams/${ui.item.value}/members`);
                             return false;
                         },
                         response: function (event, ui) {
@@ -102,18 +108,18 @@
         });
     }
 
-    function getProjectWorker(url) {
+    function getTeamMembers(url) {
         $.ajax({
             url: url,
             method: 'get',
             success: function (json) {
-                let workers = json;
-                workers = workers.map(worker => {
-                    return { 'label': worker.fullname, 'value': worker._id }
+                let members = json;
+                members = members.map(member => {
+                    return { 'label': member.fullname, 'value': member._id }
                 });
-                let performersInput = $('#performersInputId');
+                let workersInput = $('#workersInputId');
 
-                $('#performersBlobInputId')
+                $('#workersBlobInputId')
                     .on('keydown', function (event) {
                         if (event.keyCode === $.ui.keyCode.TAB &&
                             $(this).autocomplete('instance').menu.active) {
@@ -123,7 +129,7 @@
                     .on('focusout', function (event) {
                         if (this.onFocusoutClear) {
                             this.value = '';
-                            performersInput.val('');
+                            workersInput.val('');
                             this.onFocusoutClear = false;
                         } else if (this.value.endsWith(', ')) {
                             let terms = split(this.value, /, \s*/);
@@ -137,7 +143,7 @@
                     .autocomplete({
                         minLength: 0,
                         source: function (request, response) {
-                            response($.ui.autocomplete.filter(workers, extractLast(request.term)));
+                            response($.ui.autocomplete.filter(members, extractLast(request.term)));
                         },
                         focus: function () {
                             return false;
@@ -149,11 +155,11 @@
                             terms.push('');
                             this.value = terms.join(', ');
 
-                            terms = split(performersInput.val());
+                            terms = split(workersInput.val());
                             terms.pop();
                             terms.push(ui.item.value);
                             terms.push('');
-                            performersInput.val(terms.join(' '));
+                            workersInput.val(terms.join(' '));
                             return false;
                         },
                         response: function (event, ui) {
@@ -166,7 +172,7 @@
 
 
     (() => {
-        getUserProjects('/api/v1/users/{{ userSession._id }}/projects');
+        getUserTeams('/api/v1/users/{{ userSession._id }}/teams');
 
         $('#periodFromInputId').prop('min', new Date().toLocaleDateString('fr-ca'));
     })();

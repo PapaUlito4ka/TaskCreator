@@ -1,20 +1,21 @@
 {% extends "../index.html" %}
 
 {% block title %}
-<title>Create team</title>
+<title>Update team</title>
 {% endblock %}
 
 {% block content %}
 <h2>Create your own team</h2>
-<form method="post" action="/teams/" id="teamFormId">
+<form id="teamFormId" onsubmit="sendForm()">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
-        <input type="text" class="form-control" id="nameInputId" name="name" required>
+        <input type="text" class="form-control" id="nameInputId" name="name" value="{{ team.name }}" required>
     </div>
     <div class="mb-3">
         <label for="membersInputId" class="form-label">Members</label>
-        <input type="text" class="form-control" id="membersBlobInputId" name="members_blob" required>
-        <input type="text" class="form-control" id="membersInputId" name="members" hidden>
+        <input type="text" class="form-control" id="membersBlobInputId" name="members_blob"
+            value="{{ team.membersBlob }}" required>
+        <input type="text" class="form-control" id="membersInputId" name="members" value="{{ team.members }}" hidden>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -22,6 +23,17 @@
 
 {% block scripts %}
 <script>
+    function sendForm() {
+        $.ajax({
+            type: 'put',
+            url: '/teams/{{team._id}}',
+            data: $('#teamFormId').serialize(),
+            success: function (data, textStatus, jqXHR) {
+                alert('everything was OK');
+            }
+        });
+    }
+
     function split(val, regExpr = / \s*/) {
         return val.split(regExpr);
     }

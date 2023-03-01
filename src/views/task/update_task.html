@@ -6,37 +6,52 @@
 
 {% block content %}
 <h2>Create your own task</h2>
-<form method="post" action="/tasks/" id="taskFormId">
+<form id="taskFormId">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
-        <input type="text" class="form-control" id="nameInputId" name="name" required>
+        <input type="text" class="form-control" id="nameInputId" name="name" value="{{ task.name }}" required>
     </div>
     <div class="mb-3">
         <label for="descriptionInputId" class="form-label">Description</label>
-        <input type="text" class="form-control" id="descriptionInputId" name="description">
+        <input type="text" class="form-control" id="descriptionInputId" name="description"
+            value="{{ task.description }}">
     </div>
     <div class="mb-3">
         <label for="projectInputId" class="form-label">Project</label>
-        <input type="text" class="form-control" id="projectBlobInputId" name="project_blob" required>
-        <input type="text" class="form-control" id="projectInputId" name="project" hidden>
+        <input type="text" class="form-control" id="projectBlobInputId" name="project_blob"
+            value="{{ task.projectBlob }}" required>
+        <input type="text" class="form-control" id="projectInputId" name="project" value="{{ task.project }}" hidden>
     </div>
     <div class="mb-3">
         <label for="performersInputId" class="form-label">Performers</label>
-        <input type="text" class="form-control" id="performersBlobInputId" name="performers_blob" required>
-        <input type="text" class="form-control" id="performersInputId" name="performers" hidden>
+        <input type="text" class="form-control" id="performersBlobInputId" name="performers_blob"
+            value="{{ task.performersBlob }}" required>
+        <input type="text" class="form-control" id="performersInputId" name="performers" value="{{ task.performers }}"
+            hidden>
     </div>
     <div class="mb-3">
         <label for="statusInputId" class="form-label">Status</label>
         <select class="form-select" id="statusInputId">
+            {% if task.status == 'created' %}
             <option selected value="created">Created</option>
             <option value="in-progress">In-progress</option>
             <option value="done">Done</option>
+            {% elif task.status == 'in-progress' %}
+            <option value="created">Created</option>
+            <option selected value="in-progress">In-progress</option>
+            <option value="done">Done</option>
+            {% elif task.status == 'done' %}
+            <option value="created">Created</option>
+            <option value="in-progress">In-progress</option>
+            <option selected value="done">Done</option>
+            {% endif %}
         </select>
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
-        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]">
-        <input type="date" class="form-control" id="periodToInputId" name="period[to]">
+        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]"
+            value="{{ task.period.from }}">
+        <input type="date" class="form-control" id="periodToInputId" name="period[to]" value="{{ task.period.to }}">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -44,6 +59,16 @@
 
 {% block scripts %}
 <script>
+    function sendForm() {
+        $.ajax({
+            type: 'put',
+            url: '/tasks/{{ task._id }}',
+            data: $('#taskFormId').serialize(),
+            success: function (data, textStatus, jqXHR) {
+                alert('everything was OK');
+            }
+        });
+    }
 
     function split(val, regExpr = / \s*/) {
         return val.split(regExpr);
