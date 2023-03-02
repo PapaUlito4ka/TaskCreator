@@ -7,7 +7,7 @@
 {% block content %}
 <div class="mb-2 d-flex flex-row justify-content-between">
     <h2 class="mb-0">{{ task.name }}</h2>
-    <a href="#" class="btn btn-primary">Change</a>
+    <a href="/tasks/{{ task._id }}/update" class="btn btn-primary">Change</a>
 </div>
 
 <div class="mb-4">
@@ -86,7 +86,7 @@
                     {% if comment.modified %}<small></small>{% endif %}
                 </div>
                 <p class="card-text">{{ comment.body }}</p>
-                <a href="#" class="btn btn-primary">Change</a>
+                <a href="/comments/{{ comment._id }}/update" class="btn btn-primary">Change</a>
             </div>
         </div>
         {% endfor %}

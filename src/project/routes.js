@@ -1,5 +1,6 @@
 const express = require('express');
 const { handleApiError } = require('../error');
+const { Project } = require('./models');
 const ProjectService = require('./services');
 
 
@@ -24,9 +25,15 @@ router.get('/create', (req, res, next) => {
     });
 });
 
+router.get('/:id/update', (req, res, next) => {
+    ProjectService.updateProjectPage(req.session.user, req.params.id)
+        .then(project => res.render('project/update_project.html', project))
+        .catch(err => handleApiError(err, res, next));
+});
+
 router.post('/', (req, res, next) => {
     ProjectService.createProject(req.session.user, req.body)
-        .then(() => res.redirect('/projects/leaded'))
+        .then(() => res.redirect('/projects'))
         .catch(err => handleApiError(err, res, next))
 });
 

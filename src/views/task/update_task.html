@@ -1,12 +1,12 @@
 {% extends "../index.html" %}
 
 {% block title %}
-<title>Create task</title>
+<title>Update task</title>
 {% endblock %}
 
 {% block content %}
-<h2>Create your own task</h2>
-<form id="taskFormId">
+<h2>Update task</h2>
+<form id="taskFormId" onsubmit="sendForm()">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
         <input type="text" class="form-control" id="nameInputId" name="name" value="{{ task.name }}" required>
@@ -20,13 +20,14 @@
         <label for="projectInputId" class="form-label">Project</label>
         <input type="text" class="form-control" id="projectBlobInputId" name="project_blob"
             value="{{ task.projectBlob }}" required>
-        <input type="text" class="form-control" id="projectInputId" name="project" value="{{ task.project }}" hidden>
+        <input type="text" class="form-control" id="projectInputId" name="project" value="{{ task.project._id }}"
+            hidden>
     </div>
     <div class="mb-3">
         <label for="performersInputId" class="form-label">Performers</label>
         <input type="text" class="form-control" id="performersBlobInputId" name="performers_blob"
             value="{{ task.performersBlob }}" required>
-        <input type="text" class="form-control" id="performersInputId" name="performers" value="{{ task.performers }}"
+        <input type="text" class="form-control" id="performersInputId" name="performers" value="{{ task.performerIds }}"
             hidden>
     </div>
     <div class="mb-3">
@@ -49,9 +50,10 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
-        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]"
-            value="{{ task.period.from }}">
-        <input type="date" class="form-control" id="periodToInputId" name="period[to]" value="{{ task.period.to }}">
+        <input type="date" class="form-control mb-3" id="periodFromInputId" name="from"
+            value="{{ task.period.from.toLocaleDateString('fr-ca') }}" required>
+        <input type="date" class="form-control" id="periodToInputId" name="to"
+            value="{{ task.period.to.toLocaleDateString('fr-ca') }}" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -65,8 +67,10 @@
             url: '/tasks/{{ task._id }}',
             data: $('#taskFormId').serialize(),
             success: function (data, textStatus, jqXHR) {
-                alert('everything was OK');
+                window.location.href = '/tasks';
             }
+        }).always(data => {
+            console.log(data);
         });
     }
 

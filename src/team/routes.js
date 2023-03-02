@@ -20,7 +20,7 @@ router.get('/founded', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
     TeamService.createTeam(req.session.user, req.body)
-        .then(() => res.redirect('/teams/founded'))
+        .then(() => res.redirect('/teams'))
         .catch(err => handleApiError(err, res, next))
 });
 
@@ -28,6 +28,12 @@ router.get('/create', (req, res, next) => {
     res.render('team/create_team.html', {
         'userSession': req.session.user
     });
+});
+
+router.get('/:id/update', (req, res, next) => {
+    TeamService.updateTeamPage(req.session.user, req.params.id)
+        .then(team => res.render('team/update_team.html', team))
+        .catch(err => handleApiError(err, res, next));
 });
 
 router.patch('/:id', (req, res, next) => {

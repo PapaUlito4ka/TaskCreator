@@ -1,0 +1,33 @@
+{% extends "../index.html" %}
+
+{% block title %}
+<title>Update comment</title>
+{% endblock %}
+
+{% block content %}
+<h2>Update comment</h2>
+<form id="commentFormId" onsubmit="sendForm()">
+    <div class="mb-3 form-floating">
+        <textarea class="form-control" placeholder="Leave a comment here" id="bodyInputId"
+            required>{{ comment.body }}</textarea>
+        <label for="floatingTextarea">Leave comment</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function sendForm() {
+        $.ajax({
+            type: 'put',
+            url: '/comments/{{ comment._id }}',
+            data: $('#teamFormId').serialize(),
+            success: function (data, textStatus, jqXHR) {
+                alert('everything was OK');
+            }
+        });
+    }
+
+</script>
+{% endblock %}

@@ -16,11 +16,12 @@ module.exports.getFoundedTeams = async function (userSession) {
 
 module.exports.createTeam = async function (userSession, body) {
     let user = await User.findById(userSession._id);
+    let members = body.members.trim().split(' ');
 
     await Team.create({
         name: body.name,
         founder: user,
-        members: body.members,
+        members: members,
     });
 };
 
@@ -92,5 +93,20 @@ module.exports.teamPage = async function (userSession, teamId) {
     return {
         'team': team,
         'founderProfile': founderProfile
+    };
+};
+
+module.exports.updateTeamPage = async function (userSession, teamId) {
+    let team = await (await this.getTeam(userSession, teamId)).populate('members');
+    team.membersBlob = [];
+    for (let member of team.members) {
+        team.membersBlob.push(await UserProfile.findOne({ user: member }));
+    }
+    team.membersBlob = team.membersBlob.map(p => p.getFullName()).join(', ');
+    team.memberIds = team.members.map(p => p._id).join(' ');
+
+    return {
+        'userSession': userSession,
+        'team': team
     };
 };

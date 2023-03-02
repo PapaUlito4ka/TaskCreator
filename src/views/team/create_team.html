@@ -13,7 +13,7 @@
     </div>
     <div class="mb-3">
         <label for="membersInputId" class="form-label">Members</label>
-        <input type="text" class="form-control" id="membersBlobInputId" name="members_blob" required>
+        <input type="text" class="form-control" id="membersBlobInputId" name="members_blob">
         <input type="text" class="form-control" id="membersInputId" name="members" hidden>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -56,6 +56,9 @@
                             let terms = split(this.value, /, \s*/);
                             terms.pop();
                             this.value = terms.join(', ');
+                            terms = split(membersInputId.val());
+                            terms.pop();
+                            membersInputId.val(terms.join(' '));
                         }
                     })
                     .on('focusin', function (event) {

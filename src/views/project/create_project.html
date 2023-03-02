@@ -22,13 +22,13 @@
     </div>
     <div class="mb-3">
         <label for="workersInputId" class="form-label">Workers</label>
-        <input type="text" class="form-control" id="workersBlobInputId" name="workers_blob" required>
+        <input type="text" class="form-control" id="workersBlobInputId" name="workers_blob">
         <input type="text" class="form-control" id="workersInputId" name="workers" hidden>
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
-        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period[from]">
-        <input type="date" class="form-control" id="periodToInputId" name="period[to]">
+        <input type="date" class="form-control mb-3" id="periodFromInputId" name="from" required>
+        <input type="date" class="form-control" id="periodToInputId" name="to" required>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
@@ -121,6 +121,9 @@
                             let terms = split(this.value, /, \s*/);
                             terms.pop();
                             this.value = terms.join(', ');
+                            terms = split(workersInput.val());
+                            terms.pop();
+                            workersInput.val(terms.join(' '));
                         }
                     })
                     .on('focusin', function (event) {
@@ -161,6 +164,7 @@
         getUserTeams('/api/v1/users/{{ userSession._id }}/teams');
 
         $('#periodFromInputId').prop('min', new Date().toLocaleDateString('fr-ca'));
+        $('#periodFromInputId').prop('value', new Date().toLocaleDateString('fr-ca'));
     })();
 
 </script>

@@ -20,6 +20,12 @@ router.patch('/:id', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
+router.get('/:id/update', (req, res, next) => {
+    res.render('comment/update_comment.html', {
+        'userSession': req.session.user
+    });
+});
+
 router.delete('/:id', (req, res, next) => {
     CommentService.deleteComment(req.session.user, req.params.id, req.body)
         .then(() => res.redirect('/tasks'))

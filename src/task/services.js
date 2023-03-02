@@ -17,15 +17,18 @@ module.exports.getEntrustedTasks = async function (userSession) {
 
 module.exports.createTask = async function (userSession, body) {
     let user = await User.findById(userSession._id);
-    let periodFrom = new Date(body.from) || null;
+    let periodFrom = new Date(body.from) || new Date();
     let periodTo = new Date(body.to);
+    let performers = body.performers.trim().split(' ');
+
+    console.log(performers);
 
     await Task.create({
         name: body.name,
         description: body.description,
         project: body.project,
         creator: user,
-        performers: body.performers || [],
+        performers: performers,
         status: body.status,
         period: {
             from: periodFrom,
@@ -43,22 +46,16 @@ module.exports.updateTask = async function (userSession, taskId, body) {
     }
 
     let fieldsToChange = {
-        name: task.name,
-        description: task.description,
-        project: task.project,
-        performers: task.performers,
-        status: task.status,
+        name: body.name,
+        description: body.description,
+        project: body.project.trim(),
+        performers: body.performers.trim().split(' '),
+        status: body.status,
         period: {
-            from: task.period.from,
-            to: task.period.to
+            from: body.from,
+            to: body.to
         },
     };
-
-    for (key in body) {
-        if (key in fieldsToChange) {
-            fieldsToChange[key] = body[key];
-        }
-    }
 
     await task.update({ $set: fieldsToChange });
 };
@@ -110,5 +107,21 @@ module.exports.taskPage = async function (userSession, taskId) {
         'creatorProfile': creatorProfile,
         'performerProfiles': performerProfiles,
         'comments': comments
+    };
+};
+
+module.exports.updateTaskPage = async function (userSession, taskId) {
+    let task = await (await this.getTask(userSession, taskId)).populate(['project', 'performers']);
+    task.projectBlob = task.project.name;
+    task.performersBlob = [];
+    for (let performer of task.performers) {
+        task.performersBlob.push(await UserProfile.findOne({ user: performer }));
+    }
+    task.performersBlob = task.performersBlob.map(p => p.getFullName()).join(', ');
+    task.performerIds = task.performers.map(p => p._id).join(' ');
+
+    return {
+        'userSession': userSession,
+        'task': task
     };
 };

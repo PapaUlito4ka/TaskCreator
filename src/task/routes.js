@@ -24,15 +24,21 @@ router.get('/create', (req, res, next) => {
     });
 });
 
+router.get('/:id/update', (req, res, next) => {
+    TaskService.updateTaskPage(req.session.user, req.params.id)
+        .then(task => res.render('task/update_task.html', task))
+        .catch(err => handleApiError(err, res, next));
+});
+
 router.post('/', (req, res, next) => {
     TaskService.createTask(req.session.user, req.body)
-        .then(() => res.redirect('/tasks/entrusted'))
+        .then(() => res.redirect('/tasks'))
         .catch(err => handleApiError(err, res, next))
 });
 
-router.patch('/:id', (req, res, next) => {
+router.put('/:id', (req, res, next) => {
     TaskService.updateTask(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/tasks/entrusted'))
+        .then(() => res.redirect('/tasks'))
         .catch(err => handleApiError(err, res, next))
 });
 

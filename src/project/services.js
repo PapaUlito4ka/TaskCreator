@@ -19,15 +19,16 @@ module.exports.getLeadedProjects = async function (userSession) {
 
 module.exports.createProject = async function (userSession, body) {
     let user = await User.findById(userSession._id);
-    let periodFrom = new Date(body.from) || null;
+    let periodFrom = new Date(body.from) || new Date();
     let periodTo = new Date(body.to);
+    let workers = body.workers.trim().split(' ');
 
     await Project.create({
         name: body.name,
         description: body.description,
         team: body.team,
         creator: user,
-        workers: body.workers,
+        workers: workers,
         period: {
             from: periodFrom,
             to: periodTo
@@ -118,5 +119,21 @@ module.exports.projectPage = async function (userSession, projectId) {
         'finishedTasks': finishedTasks,
         'creatorProfile': creatorProfile,
         'workerProfiles': workerProfiles
+    };
+};
+
+module.exports.updateProjectPage = async function (userSession, projectId) {
+    let project = await (await this.getProject(userSession, projectId)).populate(['team', 'workers']);
+    project.teamBlob = project.team.name;
+    project.workersBlob = [];
+    for (let worker of project.workers) {
+        project.workersBlob.push(await UserProfile.findOne({ user: worker }));
+    }
+    project.workersBlob = project.workersBlob.map(p => p.getFullName()).join(', ');
+    project.workerIds = project.workers.map(p => p._id).join(' ');
+
+    return {
+        'userSession': userSession,
+        'project': project
     };
 };
