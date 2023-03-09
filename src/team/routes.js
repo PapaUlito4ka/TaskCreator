@@ -36,9 +36,9 @@ router.get('/:id/update', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
-router.patch('/:id', (req, res, next) => {
+router.put('/:id', (req, res, next) => {
     TeamService.updateTeam(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/teams/founded'))
+        .then(team => res.json(team))
         .catch(err => handleApiError(err, res, next))
 });
 

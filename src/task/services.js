@@ -38,26 +38,25 @@ module.exports.createTask = async function (userSession, body) {
 };
 
 module.exports.updateTask = async function (userSession, taskId, body) {
-    let user = await User.findById(userSession._id);
     let task = await Task.findById(taskId);
 
-    if (task.creator !== user) {
+    if (!task.creator.equals(userSession._id)) {
         throw new Error(`You don't have access to modify this task`);
     }
 
     let fieldsToChange = {
-        name: body.name,
-        description: body.description,
+        name: body.name.trim(),
+        description: body.description.trim(),
         project: body.project.trim(),
         performers: body.performers.trim().split(' '),
         status: body.status,
         period: {
-            from: body.from,
-            to: body.to
+            from: body.periodFrom,
+            to: body.periodTo
         },
     };
 
-    await task.update({ $set: fieldsToChange });
+    return await task.updateOne({ $set: fieldsToChange });
 };
 
 module.exports.getTask = async function (userSession, taskId) {

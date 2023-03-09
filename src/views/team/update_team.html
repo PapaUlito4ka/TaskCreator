@@ -6,7 +6,7 @@
 
 {% block content %}
 <h2>Create your own team</h2>
-<form id="teamFormId" onsubmit="sendForm()">
+<form id="teamFormId">
     <div class="mb-3">
         <label for="nameInputId" class="form-label">Name</label>
         <input type="text" class="form-control" id="nameInputId" name="name" value="{{ team.name }}" required>
@@ -23,16 +23,27 @@
 
 {% block scripts %}
 <script>
-    function sendForm() {
+    $('#teamFormId').submit(function (event) {
+        var formData = {
+            name: $('#nameInputId').val(),
+            members: $('#membersInputId').val()
+        };
+
         $.ajax({
-            type: 'put',
-            url: '/teams/{{team._id}}',
-            data: $('#teamFormId').serialize(),
-            success: function (data, textStatus, jqXHR) {
-                alert('everything was OK');
-            }
+            type: 'PUT',
+            url: '/teams/{{ team._id }}',
+            xhrFields: { withCredentials: true },
+            data: formData,
+            dataType: 'json',
+            encode: true,
+        }).done(function (data) {
+            window.location.href = '/teams';
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
         });
-    }
+
+        event.preventDefault();
+    });
 
     function split(val, regExpr = / \s*/) {
         return val.split(regExpr);

@@ -31,9 +31,9 @@
     </div>
     <div class="mb-3">
         <label class="form-label">Period</label>
-        <input type="date" class="form-control mb-3" id="periodFromInputId" name="period"
+        <input type="date" class="form-control mb-3" id="periodFromInputId" name="periodFrom"
             value="{{ project.period.from.toLocaleDateString('fr-ca') }}">
-        <input type="date" class="form-control" id="periodToInputId" name="period"
+        <input type="date" class="form-control" id="periodToInputId" name="periodTo"
             value="{{ project.period.to.toLocaleDateString('fr-ca') }}">
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
@@ -42,16 +42,31 @@
 
 {% block scripts %}
 <script>
-    function sendForm() {
+    $('#projectFormId').submit(function (event) {
+        var formData = {
+            name: $('#nameInputId').val(),
+            description: $('#descriptionInputId').val(),
+            team: $('#teamInputId').val(),
+            workers: $('#workersInputId').val(),
+            periodFrom: $('#periodFromInputId').val(),
+            periodTo: $('#periodToInputId').val()
+        };
+
         $.ajax({
-            type: 'put',
+            type: 'PUT',
             url: '/projects/{{ project._id }}',
-            data: $('#projectFormId').serialize(),
-            success: function (data, textStatus, jqXHR) {
-                alert('everything was OK');
-            }
+            xhrFields: { withCredentials: true },
+            data: formData,
+            dataType: 'json',
+            encode: true,
+        }).done(function (data) {
+            window.location.href = '/projects';
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
         });
-    }
+
+        event.preventDefault();
+    });
 
     function split(val, regExpr = / \s*/) {
         return val.split(regExpr);

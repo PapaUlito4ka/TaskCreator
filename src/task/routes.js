@@ -38,7 +38,7 @@ router.post('/', (req, res, next) => {
 
 router.put('/:id', (req, res, next) => {
     TaskService.updateTask(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/tasks'))
+        .then(task => res.json(task))
         .catch(err => handleApiError(err, res, next))
 });
 

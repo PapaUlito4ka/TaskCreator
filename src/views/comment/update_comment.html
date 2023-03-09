@@ -6,9 +6,9 @@
 
 {% block content %}
 <h2>Update comment</h2>
-<form id="commentFormId" onsubmit="sendForm()">
+<form id="commentFormId">
     <div class="mb-3 form-floating">
-        <textarea class="form-control" placeholder="Leave a comment here" id="bodyInputId"
+        <textarea class="form-control" placeholder="Leave a comment here" id="bodyInputId" style="height: 200px;"
             required>{{ comment.body }}</textarea>
         <label for="floatingTextarea">Leave comment</label>
     </div>
@@ -18,16 +18,27 @@
 
 {% block scripts %}
 <script>
-    function sendForm() {
+    
+    $('#commentFormId').submit(function (event) {
+        var formData = {
+            body: $("#bodyInputId").val(),
+        };
+
         $.ajax({
-            type: 'put',
+            type: 'PUT',
             url: '/comments/{{ comment._id }}',
-            data: $('#teamFormId').serialize(),
-            success: function (data, textStatus, jqXHR) {
-                alert('everything was OK');
-            }
+            xhrFields: { withCredentials: true },
+            data: formData,
+            dataType: 'json',
+            encode: true,
+        }).done(function (data) {
+            window.location.href = '/tasks/{{ comment.task }}';
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
         });
-    }
+
+        event.preventDefault();
+    });
 
 </script>
 {% endblock %}

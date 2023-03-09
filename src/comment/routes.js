@@ -14,16 +14,16 @@ router.post('/', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
-router.patch('/:id', (req, res, next) => {
+router.put('/:id', (req, res, next) => {
     CommentService.updateComment(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/tasks'))
+        .then(comment => res.json(comment))
         .catch(err => handleApiError(err, res, next));
 });
 
 router.get('/:id/update', (req, res, next) => {
-    res.render('comment/update_comment.html', {
-        'userSession': req.session.user
-    });
+    CommentService.updateCommentPage(req.session.user, req.params.id)
+        .then(comment => res.render('comment/update_comment.html', comment))
+        .catch(err => handleApiError(err, res, next));
 });
 
 router.delete('/:id', (req, res, next) => {

@@ -54,3 +54,22 @@ module.exports.updateUserProfile = async function (userSession, body) {
     await user.update({ $set: userFieldsToChange });
     await userProfile.update({ $set: userProfileFieldsToChange });
 };
+
+module.exports.profilePage = async function (userSession) {
+    let userProfile = await UserProfile.findOne({ user: userSession });
+
+    return {
+        'user': userSession,
+        'userProfile': userProfile
+    };
+};
+
+module.exports.userProfilePage = async function (userSession, userId) {
+    let user = await User.findById(userId);
+    let userProfile = await UserProfile.findOne({ user: user });
+
+    return {
+        'user': user,
+        'userProfile': userProfile,
+    };
+};

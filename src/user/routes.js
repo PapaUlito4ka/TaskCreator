@@ -9,8 +9,18 @@ const router = express.Router();
 router.use(isLoggedIn);
 
 router.get('/', (req, res, next) => {
-    UserService.getUserProfile(req.session.user)
-        .then(userJson => res.json(userJson))
+    UserService.profilePage(req.session.user)
+        .then(user => res.render('user/profile.html', user))
+        .catch(err => handleApiError(err, res, next));
+});
+
+router.get('/:id', (req, res, next) => {
+    if (req.params.user.id === req.params.id) {
+        res.redirect('/user');
+        return;
+    }
+    UserService.userProfilePage(req.session.user, req.params.id)
+        .then(user => res.render('user/profile.html', user))
         .catch(err => handleApiError(err, res, next));
 });
 

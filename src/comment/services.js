@@ -15,24 +15,17 @@ module.exports.createComment = async function (userSession, body) {
 };
 
 module.exports.updateComment = async function (userSession, commentId, body) {
-    let user = await User.findById(userSession._id);
     let comment = await Comment.findById(commentId);
 
-    if (comment.user !== user) {
+    if (!comment.user.equals(userSession._id)) {
         throw new Error(`You don't have access to modify this comment`);
     }
 
     let fieldsToChange = {
-        body: comment.body,
+        body: body.body.trim()
     };
 
-    for (key in body) {
-        if (key in fieldsToChange) {
-            fieldsToChange[key] = body[key];
-        }
-    }
-
-    await body.update({ $set: fieldsToChange });
+    return await comment.updateOne({ $set: fieldsToChange });
 };
 
 module.exports.deleteComment = async function (userSession, commentId) {
@@ -44,4 +37,13 @@ module.exports.deleteComment = async function (userSession, commentId) {
     }
 
     await comment.delete();
+};
+
+module.exports.updateCommentPage = async function (userSession, commentId) {
+    let comment = await Comment.findById(commentId);
+
+    return {
+        'comment': comment,
+        'userSession': userSession
+    };
 };

@@ -37,9 +37,9 @@ router.post('/', (req, res, next) => {
         .catch(err => handleApiError(err, res, next))
 });
 
-router.patch('/:id', (req, res, next) => {
+router.put('/:id', (req, res, next) => {
     ProjectService.updateProject(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/projects/leaded'))
+        .then(project => res.json(project))
         .catch(err => handleApiError(err, res, next))
 });
 

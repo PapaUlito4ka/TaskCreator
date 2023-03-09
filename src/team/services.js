@@ -26,25 +26,18 @@ module.exports.createTeam = async function (userSession, body) {
 };
 
 module.exports.updateTeam = async function (userSession, teamId, body) {
-    let user = await User.findById(userSession._id);
     let team = await Team.findById(teamId);
 
-    if (team.founder !== user) {
+    if (!team.founder.equals(userSession._id)) {
         throw new Error(`You don't have access to modify this team`);
     }
 
     let fieldsToChange = {
-        name: team.name,
-        members: team.members,
+        name: body.name.trim(),
+        members: body.members.trim().split(' '),
     };
 
-    for (key in body) {
-        if (key in fieldsToChange) {
-            fieldsToChange[key] = body[key];
-        }
-    }
-
-    await team.update({ $set: fieldsToChange });
+    return await team.updateOne({ $set: fieldsToChange });
 };
 
 module.exports.getTeam = async function (userSession, teamId) {

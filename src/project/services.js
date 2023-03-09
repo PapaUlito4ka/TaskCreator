@@ -37,31 +37,24 @@ module.exports.createProject = async function (userSession, body) {
 };
 
 module.exports.updateProject = async function (userSession, projectId, body) {
-    let user = await User.findById(userSession._id);
     let project = await Project.findById(projectId);
 
-    if (project.creator !== user) {
+    if (!project.creator.equals(userSession._id)) {
         throw new Error(`You don't have access to modify this project`);
     }
 
     let fieldsToChange = {
-        name: project.name,
-        description: project.description,
-        team: project.team,
-        workers: project.workers,
+        name: body.name.trim(),
+        description: body.description.trim(),
+        team: body.team.trim(),
+        workers: body.workers.trim().split(' '),
         period: {
-            from: project.period.from,
-            to: project.period.to
+            from: body.periodFrom,
+            to: body.periodTo
         },
     };
 
-    for (key in body) {
-        if (key in fieldsToChange) {
-            fieldsToChange[key] = body[key];
-        }
-    }
-
-    await project.update({ $set: fieldsToChange });
+    return await project.updateOne({ $set: fieldsToChange });
 };
 
 module.exports.getProject = async function (userSession, projectId) {
