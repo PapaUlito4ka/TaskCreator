@@ -35,6 +35,11 @@ const userProfileSchema = new Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        default: '',
+        maxLength: 256
+    }
 });
 
 userSchema.methods.verifyPassword = function (rawPassword) {

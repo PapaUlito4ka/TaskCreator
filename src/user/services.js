@@ -33,26 +33,15 @@ module.exports.getUserProfile = async function (userSession) {
 };
 
 module.exports.updateUserProfile = async function (userSession, body) {
-    let user = await User.findById(userSession._id);
-    let userProfile = await UserProfile.findOne({ user: user });
-    let userFieldsToChange = {
-        email: user.email,
-    };
+    let userProfile = await UserProfile.findOne({ user: userSession });
+
     let userProfileFieldsToChange = {
-        firstname: userProfile.firstname,
-        lastname: userProfile.lastname
+        firstname: body.firstname.trim(),
+        lastname: body.lastname.trim(),
+        description: body.description.trim()
     };
 
-    for (key in body) {
-        if (key in userFieldsToChange) {
-            userFieldsToChange[key] = body[key];
-        } else if (key in userProfileFieldsToChange) {
-            userProfileFieldsToChange[key] = body[key];
-        }
-    }
-
-    await user.update({ $set: userFieldsToChange });
-    await userProfile.update({ $set: userProfileFieldsToChange });
+    return await userProfile.updateOne({ $set: userProfileFieldsToChange });
 };
 
 module.exports.profilePage = async function (userSession) {
@@ -60,7 +49,8 @@ module.exports.profilePage = async function (userSession) {
 
     return {
         'user': userSession,
-        'userProfile': userProfile
+        'userProfile': userProfile,
+        'userSession': userSession
     };
 };
 
@@ -71,5 +61,16 @@ module.exports.userProfilePage = async function (userSession, userId) {
     return {
         'user': user,
         'userProfile': userProfile,
+        'userSession': userSession
+    };
+};
+
+module.exports.changeProfilePage = async function (userSession) {
+    let userProfile = await UserProfile.findOne({ user: userSession });
+
+    return {
+        'user': userSession,
+        'userProfile': userProfile,
+        'userSession': userSession
     };
 };

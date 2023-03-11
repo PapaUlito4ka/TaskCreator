@@ -52,29 +52,42 @@
             <div class="card p-2 mb-3" style="min-height: 100px;">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2>Active tasks</h2>
-                    <a href="#">View all</a>
+                    <a href="/tasks">View all</a>
                 </div>
                 <div class="border-top mb-2"></div>
-                
-                {% if tasks %}
-                    {% for task in tasks %}
 
-                        <div class="d-flex flex-column">
-                            <div class="d-flex flex-row">
-                                <p>{{ task.name }}</p>
-                                <p>{{ task.creator.firstname }}</p>
-                                <p>{{ task.creator.lastname }}</p>
-                            </div>
-                            <div class="d-flex flex-row">
-                                <p>{{ task.project.name }}</p>
-                                <p>{{ task.period.from }}</p>
-                                <p>{{ task.period.to }}</p>
-                            </div>
-                        </div>
+                {% if tasks.length %}
+                {% for task in tasks %}
 
-                    {% endfor %}
+                {% if task.status == "created" %}
+                {% set borderColor = "primary" %}
+                {% elif task.status == "in-progress" %}
+                {% set borderColor = "warning" %}
                 {% else %}
-                    <small>No active tasks</small>
+                {% set borderColor = "success" %}
+                {% endif %}
+                <div class="flex-fill card mb-2 border border-{{ borderColor }}"
+                    onclick="location.href='/tasks/{{task._id}}';" style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ task.period.from.toLocaleDateString('en-ZA') }} -
+                            {{ task.period.to.toLocaleDateString('en-ZA') }}
+                        </h6>
+                        <p class="card-text">
+                            {% if task.description %}
+                            {{ task.description }}
+                            {% else %}
+                            No description
+                            {% endif %}
+                        </p>
+                        <p class="card-text text-{{ borderColor }}">{{ task.status }}</p>
+                    </div>
+                </div>
+
+                {% endfor %}
+                {% else %}
+                <div class="flex-fill card p-2 mb-2">No tasks</div>
                 {% endif %}
 
             </div>
@@ -82,52 +95,60 @@
             <div class="card p-2 mb-3" style="min-height: 100px;">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2>Projects</h2>
-                    <a href="#">View all</a>
+                    <a href="/projects">View all</a>
                 </div>
                 <div class="border-top mb-2"></div>
                 {% if projects %}
-                    {% for project in projects %}
+                {% for project in projects %}
 
-                        <div class="d-flex flex-column">
-                            <div class="d-flex flex-row">
-                                <p>{{ project.name }}</p>
-                                <p>{{ task.creator.firstname }}</p>
-                                <p>{{ task.creator.lastname }}</p>
-                            </div>
-                            <div class="d-flex flex-row">
-                                <p>{{ project.workers }}</p>
-                                <p>{{ project.period.from }}</p>
-                                <p>{{ project.period.to }}</p>
-                            </div>
-                        </div>
+                <div class="flex-fill card mb-2" onclick="location.href='/projects/{{project._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ project.period.from.toLocaleDateString('en-ZA') }} -
+                            {{ project.period.to.toLocaleDateString('en-ZA') }}
+                        </h6>
+                        <p class="card-text">
+                            {% if project.description %}
+                            {{ project.description }}
+                            {% else %}
+                            No description
+                            {% endif %}
+                        </p>
+                        <p class="card-text text-{{ borderColor }}">{{ project.workers.length + 1 }} members</p>
+                    </div>
+                </div>
 
-                    {% endfor %}
+                {% endfor %}
                 {% else %}
-                    <small>No projects</small>
+                <div class="flex-fill card p-2 mb-2">No projects</div>
                 {% endif %}
             </div>
 
             <div class="card p-2 mb-3" style="min-height: 100px;">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2>Teams</h2>
-                    <a href="#">View all</a>
+                    <a href="/teams">View all</a>
                 </div>
                 <div class="border-top mb-2"></div>
                 {% if teams %}
-                    {% for team in teams %}
+                {% for team in teams %}
 
-                        <div class="d-flex flex-column">
-                            <div class="d-flex flex-row">
-                                <p>{{ team.name }}</p>
-                                <p>{{ task.founder.firstname }}</p>
-                                <p>{{ task.founder.lastname }}</p>
-                                <p>{{ task.members }}</p>
-                            </div>
-                        </div>
+                <div class="flex-fill card mb-2" onclick="location.href='/teams/{{team._id}}';"
+                    style="cursor: pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ team.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ team.founderProfile.lastname }} {{ team.founderProfile.firstname }}
+                        </h6>
+                        <p class="card-text">{{ team.members.length + 1 }} members</p>
+                    </div>
+                </div>
 
-                    {% endfor %}
+                {% endfor %}
                 {% else %}
-                    <small>No teams</small>
+                <div class="flex-fill card p-2 mb-2">No teams</div>
                 {% endif %}
             </div>
             {% endblock %}

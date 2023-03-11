@@ -14,6 +14,12 @@ router.get('/', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
+router.get('/change', (req, res, next) => {
+    UserService.changeProfilePage(req.session.user)
+        .then(user => res.render('user/update_profile.html', user))
+        .catch(err => handleApiError(err, res, next));
+});
+
 router.get('/:id', (req, res, next) => {
     if (req.params.user.id === req.params.id) {
         res.redirect('/user');
@@ -24,9 +30,9 @@ router.get('/:id', (req, res, next) => {
         .catch(err => handleApiError(err, res, next));
 });
 
-router.patch('/', (req, res, next) => {
+router.put('/', (req, res, next) => {
     UserService.updateUserProfile(req.session.user, req.body)
-        .then(() => res.redirect('/user'))
+        .then(userProfile => res.json(userProfile))
         .catch(err => handleApiError(err, res, next))
 });
 
