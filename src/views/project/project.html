@@ -17,19 +17,23 @@
             {% if project.description %}
             <p>{{ project.description }}</p>
             {% else %}
-            <p><i>Project has no description</i></p>
+            <p><i>No description</i></p>
             {% endif %}
         </div>
     </div>
 
     <div class="row mb-2">
         <div class="col-2">Team</div>
-        <div class="col-10">{{ project.team.name }}</div>
+        <div class="col-10">
+            <a href="/teams/{{ project.team._id }}">{{ project.team.name }}</a>
+        </div>
     </div>
 
     <div class="row mb-2">
         <div class="col-2">Creator</div>
-        <div class="col-10">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</div>
+        <div class="col-10">
+            <a href="/user/{{ creatorProfile.user._id}}">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</a>
+        </div>
     </div>
 
     <div class="row mb-2">
@@ -37,10 +41,10 @@
         <div class="col-10 d-flex flex-column">
             {% if workerProfiles.length %}
             {% for worker in workerProfiles %}
-            <p>{{ worker.lastname }} {{ worker.firstname }}</p>
+            <a href="/user/{{ worker.user._id }}">{{ worker.lastname }} {{ worker.firstname }}</a>
             {% endfor %}
             {% else %}
-            <p><i>Project has no workers</i></p>
+            <p><i>No workers</i></p>
             {% endif %}
         </div>
     </div>
@@ -60,7 +64,7 @@
 <div class="row">
     <h3>Tasks</h3>
 
-    <div class="container text-center">
+    <div class="container text-center mt-2">
         <div class="row gx-2">
             <div class="col">
                 <h4><i class="text-danger">Expired</i></h4>

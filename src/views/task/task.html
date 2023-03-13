@@ -12,7 +12,9 @@
 
 <div class="mb-4">
     <div class="row mb-2">
-        {% if task.status == "created" %}
+        {% if task.isExpired %}
+        {% set borderColor = "danger" %}
+        {% elif task.status == "created" %}
         {% set borderColor = "primary" %}
         {% elif task.status == "in-progress" %}
         {% set borderColor = "warning" %}
@@ -36,19 +38,23 @@
 
     <div class="row mb-2">
         <div class="col-2">Creator</div>
-        <div class="col-10">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</div>
+        <div class="col-10">
+            <a href="/user/{{ creatorProfile.user._id }}">{{ creatorProfile.lastname }} {{ creatorProfile.firstname }}</a>
+        </div>
     </div>
 
     <div class="row mb-2">
         <div class="col-2">Project</div>
-        <div class="col-10">{{ task.project.name }}</div>
+        <div class="col-10">
+            <a href="/projects/{{ task.project._id }}">{{ task.project.name }}</a>
+        </div>
     </div>
 
     <div class="row mb-2">
         <div class="col-2">Performers</div>
         <div class="col-10 d-flex flex-column">
             {% for performer in performerProfiles%}
-            <p>{{ performer.lastname }} {{ performer.firstname }}</p>
+            <a href="/user/{{ performer.user._id }}">{{ performer.lastname }} {{ performer.firstname }}</a>
             {% endfor %}
         </div>
     </div>
@@ -60,7 +66,9 @@
 
     <div class="row mb-2">
         <div class="col-2">End date</div>
-        <div class="col-10">{{ task.period.to.toString().split(' ').slice(1, 4).join(' ') }}</div>
+        <div class="col-10 {% if task.isExpired %}text-{{ borderColor }}{% endif %}">
+            {{ task.period.to.toString().split(' ').slice(1, 4).join(' ') }}{% if task.isExpired %} - Expired{% endif %}
+        </div>
     </div>
 
 </div>
@@ -68,11 +76,11 @@
 <div class="row">
     <h3>Comments</h3>
 
-    <form class="d-flex flex-row mb-2">
+    <form method="post" action="/comments" class="d-flex flex-row mb-4">
         <div class="flex-grow-1">
-            <input type="text" class="form-control" placeholder="Send comment . . .">
+            <input type="text" class="form-control" placeholder="Send comment . . ." name="body">
+            <input type="text" name="task" value="{{ task._id }}" hidden>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
     <div class="d-flex flex-column">
@@ -82,16 +90,18 @@
             <div class="card-body">
                 <div class="d-flex flex-row justify-content-between">
                     <h5 class="card-title">{{ comment.userProfile.lastname }} {{ comment.userProfile.firstname }}</h5>
-                    <small>{{ comment.createdAt }}</small>
+                    <small>{{ comment.createdAt.toLocaleDateString('en-ZA') }}</small>
                     {% if comment.modified %}<small></small>{% endif %}
                 </div>
                 <p class="card-text">{{ comment.body }}</p>
-                <a href="/comments/{{ comment._id }}/update" class="btn btn-primary">Change</a>
+                <div class="d-flex justify-content-end">
+                    <a href="/comments/{{ comment._id }}/update" class="btn btn-primary">Change</a>
+                </div>
             </div>
         </div>
         {% endfor %}
         {% else %}
-        <p><i>No comments</i></p>
+        <p class="text-center"><i>No comments</i></p>
         {% endif %}
     </div>
 </div>

@@ -51,7 +51,7 @@
     <div class="mb-3">
         <label class="form-label">Period</label>
         <input type="date" class="form-control mb-3" id="periodFromInputId" name="from"
-            value="{{ task.period.from.toLocaleDateString('fr-ca') }}" required>
+            value="{{ task.period.from.toLocaleDateString('fr-ca') }}" disabled>
         <input type="date" class="form-control" id="periodToInputId" name="to"
             value="{{ task.period.to.toLocaleDateString('fr-ca') }}" required>
     </div>
@@ -68,7 +68,6 @@
             project: $('#projectInputId').val(),
             performers: $('#performersInputId').val(),
             status: $('#statusInputId').val(),
-            periodFrom: $('#periodFromInputId').val(),
             periodTo: $('#periodToInputId').val()
         };
 
@@ -210,8 +209,6 @@
 
     (() => {
         getUserProjects('/api/v1/users/{{ userSession._id }}/projects');
-
-        $('#periodFromInputId').prop('min', new Date().toLocaleDateString('fr-ca'));
     })();
 
 </script>

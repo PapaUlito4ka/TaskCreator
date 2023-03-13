@@ -10,7 +10,7 @@ module.exports.createComment = async function (userSession, body) {
     await Comment.create({
         user: user,
         task: task,
-        body: body.body
+        body: body.body.trim()
     });
 };
 

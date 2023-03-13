@@ -23,7 +23,11 @@
                 <a href="mailto: {{ user.email }}">{{ user.email }}</a>
             </div>
             <div class="card p-3 text-start">
+                {% if userProfile.description %}
                 {{ userProfile.description }}
+                {% else %}
+                <i class="text-center">No description</i>
+                {% endif %}
             </div>
         </div>
     </div>

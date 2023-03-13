@@ -61,7 +61,7 @@ module.exports.getProject = async function (userSession, projectId) {
     let user = await User.findById(userSession._id);
     let project = await Project.findById(projectId);
 
-    if (!(user in project.workers) && !project.creator.equals(user._id)) {
+    if (!(project.workers.find(worker => worker.equals(user._id)) || project.creator.equals(user._id))) {
         throw new Error(`You don't have access to view this project`);
     }
 
@@ -98,9 +98,9 @@ module.exports.projectPage = async function (userSession, projectId) {
         task.userPro
     }
     let expiredTasks = tasks.filter(task => new Date() > task.period.to);
-    let createdTasks = tasks.filter(task => task.status === 'created');
-    let inProgressTasks = tasks.filter(task => task.status === 'in-progress');
-    let finishedTasks = tasks.filter(task => task.status === 'finished');
+    let createdTasks = tasks.filter(task => task.status === 'created' && new Date() <= task.period.to);
+    let inProgressTasks = tasks.filter(task => task.status === 'in-progress' && new Date() <= task.period.to);
+    let finishedTasks = tasks.filter(task => task.status === 'done' && new Date() <= task.period.to);
     let creatorProfile = await UserProfile.findOne({ user: project.creator });
     let workerProfiles = await UserProfile.find({ user: project.workers });
 

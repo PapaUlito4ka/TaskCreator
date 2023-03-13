@@ -6,13 +6,17 @@ const { Comment } = require('../comment/models');
 module.exports.getTasks = async function (userSession) {
     let user = await User.findById(userSession._id);
 
-    return await Task.find({ performers: user._id, creator: { $ne: user } });
+    return (await Task.find({ performers: user._id, creator: { $ne: user }, status: { $ne: 'done' } }))
+        .sort((a, b) => a.period.to - b.period.to)
+        .map(task => { task.isExpired = new Date() > task.period.to; return task; });
 };
 
 module.exports.getEntrustedTasks = async function (userSession) {
     let user = await User.findById(userSession._id);
 
-    return await Task.find({ creator: user });
+    return (await Task.find({ creator: user, status: { $ne: 'done' } }))
+        .sort((a, b) => a.period.to - b.period.to)
+        .map(task => { task.isExpired = new Date() > task.period.to; return task; });
 };
 
 module.exports.createTask = async function (userSession, body) {
@@ -63,9 +67,9 @@ module.exports.getTask = async function (userSession, taskId) {
     let user = await User.findById(userSession._id);
     let task = await Task.findById(taskId);
 
-    // if (!(user in task.performers) && !task.creator.equals(user._id)) {
-    //     throw new Error(`You don't have access to view this task`);
-    // }
+    if (!(task.performers.find(performer => performer.equals(user._id)) || task.creator.equals(user._id))) {
+        throw new Error(`You don't have access to view this task`);
+    }
 
     return task;
 };
@@ -97,6 +101,8 @@ module.exports.taskPage = async function (userSession, taskId) {
     let creatorProfile = await UserProfile.findOne({ user: task.creator });
     let performerProfiles = await UserProfile.find({ user: task.performers });
     let comments = await Comment.find({ task: task });
+
+    task.isExpired = new Date() > task.period.to;
     for (let comment of comments) {
         comment.userProfile = await UserProfile.findOne({ user: comment.user });
     }

@@ -44,7 +44,7 @@ module.exports.getTeam = async function (userSession, teamId) {
     let user = await User.findById(userSession._id);
     let team = await Team.findById(teamId);
 
-    if (!(user in team.members) && !team.founder.equals(user._id)) {
+    if (!(team.members.find(member => member.equals(user._id)) || team.founder.equals(user._id))) {
         throw new Error(`You don't have access to view this team`);
     }
 

@@ -7,6 +7,7 @@ module.exports.getHomePage = async function(userSession) {
         .concat(await getEntrustedTasks(userSession))
         .sort((a, b) => a.period.to - b.period.to)
         .slice(0, 5)
+        .map(task => { task.isExpired = new Date() > task.period.to; return task; })
     let projects = (await getProjects(userSession))
         .concat(await getLeadedProjects(userSession))
         .slice(0, 5);

@@ -21,7 +21,8 @@ router.get('/change', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-    if (req.params.user.id === req.params.id) {
+    console.log(req.session.user._id, req.params.id);
+    if (req.session.user._id === req.params.id) {
         res.redirect('/user');
         return;
     }
