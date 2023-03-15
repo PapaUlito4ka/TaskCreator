@@ -1,5 +1,8 @@
+const { Project } = require('../project/models.js');
+const { Task } = require('../task/models.js');
 const { User, UserProfile } = require('../user/models.js');
 const { Team } = require('./models.js');
+const { Comment } = require('../comment/models.js');
 
 
 module.exports.getTeams = async function (userSession) {
@@ -52,14 +55,30 @@ module.exports.getTeam = async function (userSession, teamId) {
 };
 
 module.exports.deleteTeam = async function (userSession, teamId) {
-    let user = await User.findById(userSession._id);
     let team = await Team.findById(teamId);
 
-    if (team.founder !== user) {
+    if (!team.founder.equals(userSession._id)) {
         throw new Error(`You don't have access to delete this team`);
     }
 
-    await team.delete();
+    let projects = await Project.find({ team: team });
+    let tasks = await Task.find({ project: { $in: projects } });
+    await Comment.find({ task: { $in: tasks } }).deleteMany();
+    await Task.deleteMany({ _id: { $in: tasks.map(task => task._id) } });
+    await Project.deleteMany({ _id: { $in: projects.map(proj => proj._id) } });
+    return await team.deleteOne();
+};
+
+module.exports.deleteTeamMember = async function (userSession, teamId, memberId) {
+    let team = await Team.findById(teamId);
+
+    if (!team.founder.equals(userSession._id)) {
+        throw new Error(`You don't have access to delete member from team`);
+    }
+
+    let member = await User.findById(memberId);
+    team.members = team.members.filter(user => !user.equals(member._id));
+    return await team.save();
 };
 
 module.exports.teamsPage = async function (userSession) {
@@ -85,7 +104,8 @@ module.exports.teamPage = async function (userSession, teamId) {
 
     return {
         'team': team,
-        'founderProfile': founderProfile
+        'founderProfile': founderProfile,
+        'userSession': userSession
     };
 };
 

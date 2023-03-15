@@ -1,8 +1,7 @@
 const { Task } = require('../task/models.js');
 const { User, UserProfile } = require('../user/models.js');
 const { Project } = require('./models.js');
-
-const UserService = require('../user/services');
+const { Comment } = require('../comment/models');
 
 
 module.exports.getProjects = async function (userSession) {
@@ -69,14 +68,16 @@ module.exports.getProject = async function (userSession, projectId) {
 };
 
 module.exports.deleteProject = async function (userSession, projectId) {
-    let user = await User.findById(userSession._id);
     let project = await Project.findById(projectId);
 
-    if (project.creator !== user) {
+    if (!project.creator.equals(userSession._id)) {
         throw new Error(`You don't have access to delete this project`);
     }
 
-    await project.delete();
+    let tasks = await Task.find({ project: project });
+    await Comment.find({ task: { $in: tasks } }).deleteMany();
+    await Task.deleteMany({ _id: { $in: tasks.map(task => task._id) } });
+    return await project.deleteOne();
 };
 
 
@@ -111,7 +112,8 @@ module.exports.projectPage = async function (userSession, projectId) {
         'inProgressTasks': inProgressTasks,
         'finishedTasks': finishedTasks,
         'creatorProfile': creatorProfile,
-        'workerProfiles': workerProfiles
+        'workerProfiles': workerProfiles,
+        'userSession': userSession
     };
 };
 

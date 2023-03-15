@@ -51,7 +51,7 @@ router.get('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     ProjectService.deleteProject(req.session.user, req.params.id)
-        .then(() => res.redirect('/projects/leaded'))
+        .then(project => res.json(project))
         .catch(err => handleApiError(err, res, next))
 });
 

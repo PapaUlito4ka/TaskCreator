@@ -50,7 +50,13 @@ router.get('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     TeamService.deleteTeam(req.session.user, req.params.id)
-        .then(() => res.redirect('/teams/founded'))
+        .then(team => res.json(team))
+        .catch(err => handleApiError(err, res, next))
+});
+
+router.delete('/:id/members/:memberId', (req, res, next) => {
+    TeamService.deleteTeamMember(req.session.user, req.params.id, req.params.memberId)
+        .then(team => res.json(team))
         .catch(err => handleApiError(err, res, next))
 });
 

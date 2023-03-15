@@ -29,14 +29,13 @@ module.exports.updateComment = async function (userSession, commentId, body) {
 };
 
 module.exports.deleteComment = async function (userSession, commentId) {
-    let user = await User.findById(userSession._id);
     let comment = await Comment.findById(commentId);
 
-    if (comment.user !== user) {
+    if (!comment.user.equals(userSession._id)) {
         throw new Error(`You don't have access to delete this comment`);
     }
 
-    await comment.delete();
+    return await comment.delete();
 };
 
 module.exports.updateCommentPage = async function (userSession, commentId) {

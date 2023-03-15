@@ -28,7 +28,7 @@ router.get('/:id/update', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     CommentService.deleteComment(req.session.user, req.params.id, req.body)
-        .then(() => res.redirect('/tasks'))
+        .then(comment => res.json(comment))
         .catch(err => handleApiError(err, res, next));
 });
 

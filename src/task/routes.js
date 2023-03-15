@@ -50,7 +50,7 @@ router.get('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
     TaskService.deleteTask(req.session.user, req.params.id)
-        .then(() => res.redirect('/tasks/entrusted'))
+        .then(task => res.json(task))
         .catch(err => handleApiError(err, res, next))
 });
 

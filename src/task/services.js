@@ -75,14 +75,14 @@ module.exports.getTask = async function (userSession, taskId) {
 };
 
 module.exports.deleteTask = async function (userSession, taskId) {
-    let user = await User.findById(userSession._id);
     let task = await Task.findById(taskId);
 
-    if (task.creator !== user) {
+    if (!task.creator.equals(userSession._id)) {
         throw new Error(`You don't have access to delete this task`);
     }
 
-    await task.delete();
+    await Comment.find({ task: task }).deleteMany();
+    return await task.deleteOne();
 };
 
 
@@ -100,7 +100,7 @@ module.exports.taskPage = async function (userSession, taskId) {
     let task = await (await this.getTask(userSession, taskId)).populate('project');
     let creatorProfile = await UserProfile.findOne({ user: task.creator });
     let performerProfiles = await UserProfile.find({ user: task.performers });
-    let comments = await Comment.find({ task: task });
+    let comments = await Comment.find({ task: task }).sort('-createdAt');
 
     task.isExpired = new Date() > task.period.to;
     for (let comment of comments) {
@@ -111,7 +111,8 @@ module.exports.taskPage = async function (userSession, taskId) {
         'task': task,
         'creatorProfile': creatorProfile,
         'performerProfiles': performerProfiles,
-        'comments': comments
+        'comments': comments,
+        'userSession': userSession
     };
 };
 

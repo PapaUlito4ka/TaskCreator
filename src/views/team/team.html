@@ -7,14 +7,21 @@
 {% block content %}
 <div class="mb-2 d-flex flex-row justify-content-between">
     <h2 class="mb-0">{{ team.name }}</h2>
-    <a href="/teams/{{ team._id }}/update" class="btn btn-primary">Change</a>
+    {% if team.founder._id == userSession._id %}
+    <div class="d-flex">
+        <a href="/teams/{{ team._id }}/update" class="btn btn-primary me-2">Change</a>
+        <a class="btn btn-danger" id="deleteButtonId">Delete</a>
+    </div>
+    {% endif %}
 </div>
 
 <div class="mb-4">
     <div class="row mb-2">
         <div class="col-2">Founder</div>
         <div class="col-10">
-            <a href="/user/{{ founderProfile.user._id }}">{{ founderProfile.lastname }} {{ founderProfile.firstname }}</a>
+            <a href="/user/{{ founderProfile.user._id }}">
+                {{ founderProfile.lastname }} {{ founderProfile.firstname }}
+            </a>
         </div>
     </div>
 </div>
@@ -22,7 +29,6 @@
 <div class="d-flex flex-column">
     <div class="d-flex justify-content-between mb-4">
         <h3 class="mb-0">Members</h3>
-        <a href="#" class="btn btn-primary">Add members</a>
     </div>
 
     {% if team.members.length %}
@@ -30,9 +36,14 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title d-flex justify-content-between">
-                <a href="/user/{{ member._id }}">{{ member.userProfile.lastname }} {{ member.userProfile.firstname
-                    }}</a>
-                <a href="#" style="text-decoration: none; color: black;"><i class="bi bi-trash3"></i></a>
+                <a href="/user/{{ member._id }}">
+                    {{ member.userProfile.lastname }} {{ member.userProfile.firstname }}
+                </a>
+                {% if team.founder._id == userSession._id %}
+                <a style="text-decoration: none; color: black;" onclick="deleteMember('{{ member._id }}')">
+                    <i class="bi bi-trash3"></i>
+                </a>
+                {% endif %}
             </h5>
         </div>
     </div>
@@ -41,4 +52,41 @@
     <p class="text-center"><i>No members</i></p>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function deleteMember(memberId) {
+        if (!confirm('Are you sure you want to delete this member?')) {
+            return;
+        }
+
+        $.ajax({
+            method: 'delete',
+            url: `/teams/{{ team._id }}/members/${memberId}`,
+            xhrFields: { withCredentials: true }
+        }).done(function (data) {
+            window.location.href = '/teams/{{ team._id }}';
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
+        });
+    }
+
+    $('#deleteButtonId').click(function (event) {
+        if (!confirm('Are you sure you want to delete this team?')) {
+            event.preventDefault();
+            return;
+        }
+
+        $.ajax({
+            method: 'delete',
+            url: '/teams/{{ team._id }}',
+            xhrFields: { withCredentials: true }
+        }).done(function (data) {
+            window.location.href = '/teams';
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR, textStatus, errorThrown);
+        });
+    });
+</script>
 {% endblock %}
